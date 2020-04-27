@@ -1,0 +1,414 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Español (México) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
+LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MAIN DIALOGEX 0, 0, 600, 380
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Sistema Informático de Centro Médico"
+MENU IDR_MAIN_MENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "",IDC_STATIC,6,0,588,30
+    RTEXT           "Nombre de usuario",IDC_STATIC,18,12,61,8
+    LTEXT           "",IDC_MAIN_USERNAME,84,12,96,12,0,WS_EX_CLIENTEDGE
+    RTEXT           "Nombre completo",IDC_STATIC,186,12,56,8
+    LTEXT           "",IDC_MAIN_USER_FULLNAME,247,12,162,12,0,WS_EX_CLIENTEDGE
+    LTEXT           "Hoy es",IDC_STATIC,414,12,23,8
+    LTEXT           "",IDC_MAIN_TODAY,444,12,60,12,0,WS_EX_CLIENTEDGE
+    LTEXT           "Hora",IDC_STATIC,516,12,16,8
+    LTEXT           "",IDC_MAIN_TIME,540,12,48,12,0,WS_EX_CLIENTEDGE
+END
+
+IDD_REG_APP DIALOGEX 0, 30, 600, 350
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "",IDC_STATIC,6,6,378,48
+    COMBOBOX        IDC_RA_SELPATIENT_COMBO,12,30,114,108,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Selección de Paciente",IDC_STATIC,12,18,70,8
+    LTEXT           "Selección de Especialidad",IDC_STATIC,138,18,81,8
+    COMBOBOX        IDC_RA_SELSPE_COMBO,138,30,114,108,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Selección de Médico",IDC_STATIC,264,18,64,8
+    COMBOBOX        IDC_RA_SELDR_COMBO,264,30,114,108,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Información de la cita",IDC_STATIC,6,60,378,180
+    LTEXT           "Motivo de la cita",IDC_STATIC,12,84,53,8
+    EDITTEXT        IDC_RA_DESC_EDIT,72,84,300,54,ES_AUTOHSCROLL
+    RTEXT           "Máximo 300 caracteres",IDC_STATIC,294,144,75,8
+    LTEXT           "Fecha de la cita",IDC_STATIC,12,162,51,8
+    CONTROL         "",IDC_RA_APPDATE_DTP,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,72,162,100,15
+    LTEXT           "Hora de la cita",IDC_STATIC,186,162,47,8
+    CONTROL         "",IDC_RA_APPTIME_DTP,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,240,162,100,15
+    CONTROL         "Agendar doble cita",IDC_RA_DOUBLEAPP_CHECK,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,186,192,76,10
+    LTEXT           "Selección de consultorio",IDC_STATIC,12,192,77,8
+    COMBOBOX        IDC_RA_SELMO_COMBO,96,192,78,78,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Médico asignado",IDC_STATIC,396,6,192,234
+    GROUPBOX        "Fotografía",IDC_STATIC,426,24,132,132
+    CONTROL         "",IDC_DR_IMG,"Static",SS_BITMAP,438,36,108,108
+    LTEXT           "Nombre del médico",IDC_STATIC,408,168,61,8
+    EDITTEXT        IDC_DR_NAME_EDIT,408,181,168,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Cédula profesional",IDC_STATIC,408,204,60,8
+    EDITTEXT        IDC_DR_PROID_EDIT,408,216,168,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Teléfono de Contacto",IDC_STATIC,12,216,70,8
+    EDITTEXT        IDC_RA_PHONENUM_EDIT,96,216,78,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Nota: Para agendar una doble cita, el horario siguiente al programado debe estar libre.",IDC_STATIC,186,216,150,18
+    GROUPBOX        "Información del paciente",IDC_STATIC,6,246,378,90
+    LTEXT           "Nombre del paciente",IDC_STATIC,12,264,66,8
+    LTEXT           "Género",IDC_STATIC,288,264,24,8
+    LTEXT           "Fecha de nacimiento",IDC_STATIC,12,312,66,8
+    EDITTEXT        IDC_PATIENT_NAME_EDIT,84,264,192,14,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_PATIENT_BIRTHD_EDIT,84,312,78,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Edad",IDC_STATIC,12,288,17,8
+    EDITTEXT        IDC_PATIENT_AGE_EDIT,36,288,40,14,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_PATIENT_GENDER_EDIT,318,264,40,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Estatura",IDC_STATIC,84,288,28,8
+    EDITTEXT        IDC_PATIENT_H_EDIT,120,288,40,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Peso",IDC_STATIC,168,288,16,8
+    EDITTEXT        IDC_PATIENT_W_EDIT,192,288,40,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Tipo de Sangre",IDC_STATIC,240,288,49,8
+    EDITTEXT        IDC_PATIENT_BLOOD_EDIT,294,288,40,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Reservar cita",IDC_RA_RESERVEAPP_CMD,408,258,168,14
+    PUSHBUTTON      "Borrar todos los campos",IDC_RA_CLEARAPP_CMD,408,276,168,14
+    LTEXT           "Errores: No hay errores",IDC_RA_ERROR_LOG,408,294,168,30,0,WS_EX_STATICEDGE
+    GROUPBOX        "",IDC_STATIC,396,246,192,90
+END
+
+IDD_QUERY_APP DIALOGEX 0, 30, 600, 350
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Configuración de la consulta",IDC_STATIC,6,6,282,300
+    LTEXT           "Tipo de consulta",IDC_STATIC,18,24,53,8
+    COMBOBOX        IDC_QA_ATYPE_COMBO,18,36,114,78,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Código de la cita",IDC_STATIC,24,90,54,8
+    EDITTEXT        IDC_QA_APPCODE_EDIT,24,102,114,14,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Cédula profesional del médico",IDC_STATIC,24,156,96,8
+    LTEXT           "Consultorio",IDC_STATIC,324,24,37,8
+    COMBOBOX        IDC_QA_MO_COMBO,324,36,114,78,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Semana",IDC_STATIC,156,90,26,8
+    CONTROL         "",IDC_QA_WEEK_DTP,"SysDateTimePick32",DTS_RIGHTALIGN | WS_DISABLED | WS_TABSTOP,156,102,114,15
+    PUSHBUTTON      "Buscar médico",IDC_QA_SEARCHDR_CMD,24,186,114,14,WS_DISABLED
+    EDITTEXT        IDC_QA_PID_EDIT,24,169,114,14,ES_AUTOHSCROLL | WS_DISABLED
+    GROUPBOX        "Consulta por código de cita",IDC_STATIC,18,72,126,60
+    GROUPBOX        "Consulta por médico",IDC_STATIC,18,138,126,162
+    LTEXT           "Nombre del médico",IDC_STATIC,24,204,61,8
+    EDITTEXT        IDC_QA_DRNAME_EDIT,24,216,114,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Especialidad del médico",IDC_STATIC,24,234,75,8
+    LTEXT           "Mes de la cita",IDC_STATIC,24,264,44,8
+    COMBOBOX        IDC_QA_MONTH_COMBO,24,276,114,78,CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Consulta por semana",IDC_STATIC,150,72,126,60
+    GROUPBOX        "Consulta por especialidad",IDC_STATIC,150,138,126,84
+    LTEXT           "Especialidad",IDC_STATIC,156,156,40,8
+    COMBOBOX        IDC_QA_SPE_COMBO,156,168,114,78,CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Semana",IDC_STATIC,156,186,26,8
+    CONTROL         "",IDC_QA_WEEK_DTP2,"SysDateTimePick32",DTS_RIGHTALIGN | WS_DISABLED | WS_TABSTOP,156,198,114,15
+    LTEXT           "Seleccione un tipo de consulta para desbloquear su configuración",IDC_STATIC,144,30,126,24
+    PUSHBUTTON      "Realizar consulta",IDC_QA_SEARCHAPP_CMD,156,246,114,14
+    GROUPBOX        "Acciones de consulta",IDC_STATIC,150,228,126,72
+    PUSHBUTTON      "Reestablecer consulta",IDC_QA_CLEARAPP_CMD,156,270,114,14
+    GROUPBOX        "Resultados de la consulta",IDC_STATIC,300,6,282,300
+    GROUPBOX        "Lista de citas",IDC_STATIC,318,54,126,246
+    LISTBOX         IDC_QA_APP_LIST,324,66,114,228,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Seleccione el consultorio para el cual quiere ver los resultados de la consulta",IDC_STATIC,450,24,119,24
+    GROUPBOX        "Acciones de cita",IDC_STATIC,450,54,126,90
+    PUSHBUTTON      "Ver información de la cita",IDC_QA_LOOKAPP_CMD,456,72,114,14
+    PUSHBUTTON      "Marcar cita como Atendida",IDC_QA_MARKAPP_CMD,456,96,114,14
+    PUSHBUTTON      "Cancelar la cita",IDC_QA_CANCELAPP_CMD,456,120,114,14
+    EDITTEXT        IDC_QA_DRSPE_EDIT,24,246,114,14,ES_AUTOHSCROLL | ES_READONLY
+END
+
+IDD_REG_MED DIALOGEX 0, 30, 600, 350
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Registro de médico",IDC_STATIC,6,6,378,336
+    GROUPBOX        "Información general y de contacto",IDC_STATIC,18,24,354,144
+    RTEXT           "Primer nombre",IDC_STATIC,37,42,47,8
+    RTEXT           "Segundo nombre",IDC_STATIC,29,60,55,8
+    RTEXT           "Apellido paterno",IDC_STATIC,31,78,53,8
+    RTEXT           "Apellido materno",IDC_STATIC,30,96,54,8
+    EDITTEXT        IDC_RM_DR_FNAME_EDIT,90,42,252,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RM_DR_SNAME_EDIT,90,60,252,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RM_DR_FLNAME_EDIT,90,78,252,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RM_DR_SLNAME_EDIT,90,96,252,14,ES_AUTOHSCROLL
+    RTEXT           "Fecha de nacimiento",IDC_STATIC,30,120,66,8
+    CONTROL         "",IDC_RM_BIRTHD_DTP,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,102,120,100,15
+    LTEXT           "Género",IDC_STATIC,210,120,24,8
+    COMBOBOX        IDC_RM_GENDER_COMBO,240,119,102,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Número telefónico",IDC_STATIC,36,144,59,8
+    EDITTEXT        IDC_RM_PHONENUM_EDIT,102,144,96,14,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Información profesional",IDC_STATIC,18,174,354,120
+    LTEXT           "Cédula profesional",IDC_STATIC,24,192,60,8
+    EDITTEXT        IDC_RM_PROID_EDIT,90,192,132,14,ES_AUTOHSCROLL
+    GROUPBOX        "Horario",IDC_STATIC,30,210,330,78
+    LTEXT           "Consultorio",IDC_STATIC,234,192,37,8
+    COMBOBOX        IDC_RM_MO_COMBO,276,192,84,54,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_RM_SCHE_FROM_DTP,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,84,228,66,15
+    LTEXT           "Hora de inicio",IDC_STATIC,36,228,44,8
+    CONTROL         "",IDC_RM_SCHE_TO_DTP,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,210,228,66,15
+    LTEXT           "Hora de salida",IDC_STATIC,162,228,46,8
+    CONTROL         "Lunes",IDC_RM_MON_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,42,270,35,10
+    CONTROL         "Martes",IDC_RM_TUE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,78,270,38,10
+    CONTROL         "Miércoles",IDC_RM_WED_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,270,45,10
+    CONTROL         "Jueves",IDC_RM_THU_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,168,270,39,10
+    CONTROL         "Viernes",IDC_RM_FRI_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,210,270,39,10
+    LTEXT           "Días en los que atiende",IDC_STATIC,36,252,75,8
+    GROUPBOX        "Fotografía del médico",IDC_STATIC,390,6,204,138
+    GROUPBOX        "",IDC_STATIC,474,18,114,120
+    CONTROL         "",IDC_DR_IMG,"Static",SS_BITMAP,480,30,15,13
+    PUSHBUTTON      "Cargar imagen",IDC_RM_LOADIMG_CMD,402,30,60,14
+    GROUPBOX        "Lista de médicos",IDC_STATIC,390,150,204,192
+    LISTBOX         IDC_DR_LIST,396,168,192,108,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Ver información de la selección",IDC_RM_LOOKDR_CMD,402,282,180,14
+    PUSHBUTTON      "Eliminar registro de médico",IDC_RM_DELETEREG_CMD,402,300,180,14
+    PUSHBUTTON      "Generar reporte de médicos",IDC_RM_GENREPORT_CMD,402,318,180,14
+    PUSHBUTTON      "Registrar médico",IDC_RM_REGMED_CMD,30,324,164,14
+    PUSHBUTTON      "Borrar todos los campos",IDC_RM_CLEARREG_CMD,198,324,164,14
+    LTEXT           "",IDC_RM_IMGPATH,402,54,8,8,NOT WS_VISIBLE
+    LTEXT           "Errores: No hay errores",IDC_RM_ERROR_LOG,18,300,354,18,0,WS_EX_STATICEDGE
+END
+
+IDD_REG_SPE DIALOGEX 0, 30, 600, 350
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Información de la especialidad",IDC_STATIC,30,6,162,294
+    LTEXT           "Nombre de la especialidad",IDC_STATIC,42,24,84,8
+    EDITTEXT        IDC_RS_SPENAME_EDIT,42,36,138,14,ES_AUTOHSCROLL
+    LTEXT           "Descripción de la especialidad",IDC_STATIC,42,60,95,8
+    EDITTEXT        IDC_RS_SPEDESC_EDIT,42,72,138,114,ES_AUTOHSCROLL
+    LTEXT           "Máximo 200 caracteres",IDC_STATIC,102,192,75,8
+    GROUPBOX        "Lista de especialidades",IDC_STATIC,204,6,174,294
+    LISTBOX         IDC_SPE_LIST,216,24,150,210,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Registrar especialidad",IDC_RS_REGSPE_CMD,42,210,138,14
+    PUSHBUTTON      "Borrar todos los campos",IDC_RS_CLEARREG_CMD,42,234,138,14
+    PUSHBUTTON      "Ver información de la selección",IDC_RS_LOOKSPE_CMD,216,246,150,14
+    PUSHBUTTON      "Eliminar registro de especialidad",IDC_RS_DELETESPE_CMD,216,270,150,14
+    GROUPBOX        "Médicos de la especialidad",IDC_STATIC,390,6,174,294
+    LISTBOX         IDC_DR_LIST,402,24,150,210,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Ver información de la selección",IDC_RS_LOOKDRINFO_CMD,402,270,150,14
+    PUSHBUTTON      "Ver médicos de la especialidad",IDC_RS_LOOKDRLIST_CMD,402,246,150,14
+    LTEXT           "Errores: No hay errores",IDC_RS_ERROR_LOG,42,258,138,36,0,WS_EX_STATICEDGE
+END
+
+IDD_REG_PATIENT DIALOGEX 0, 30, 600, 350
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Registro de paciente",IDC_STATIC,6,6,372,336
+    GROUPBOX        "Información general",IDC_STATIC,18,24,348,120
+    RTEXT           "Primer nombre",IDC_STATIC,37,42,47,8
+    RTEXT           "Segundo nombre",IDC_STATIC,29,60,55,8
+    RTEXT           "Apellido paterno",IDC_STATIC,31,78,53,8
+    RTEXT           "Apellido materno",IDC_STATIC,30,96,54,8
+    EDITTEXT        IDC_RP_FNAME_EDIT,90,42,252,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RP_SNAME_EDIT,90,60,252,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RP_FLNAME_EDIT,90,78,252,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RP_SLNAME_EDIT,90,96,252,14,ES_AUTOHSCROLL
+    RTEXT           "Fecha de nacimiento",IDC_STATIC,30,120,66,8
+    LTEXT           "Número telefónico",IDC_STATIC,24,168,59,8
+    EDITTEXT        IDC_RP_PHONENUM_EDIT,90,168,96,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_RP_BIRTHD_DTP,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,102,120,100,15
+    LTEXT           "Género",IDC_STATIC,210,120,24,8
+    COMBOBOX        IDC_RP_GENDER_COMBO,240,119,102,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Información de contacto",IDC_STATIC,18,150,348,42
+    GROUPBOX        "Información médica",IDC_STATIC,18,198,348,60
+    LTEXT           "Estatura (cm)",IDC_STATIC,30,216,44,8
+    EDITTEXT        IDC_RP_H_EDIT,78,216,54,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Peso (kg)",IDC_STATIC,144,216,31,8
+    EDITTEXT        IDC_RP_W_EDIT,180,216,54,14,ES_AUTOHSCROLL
+    LTEXT           "Tipo de sangre",IDC_STATIC,246,216,48,8
+    COMBOBOX        IDC_RP_BLOOD_COMBO,300,216,48,90,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Información de referencia",IDC_STATIC,18,264,348,72
+    LTEXT           "¿Cómo se enteró de esta clínica?",IDC_STATIC,30,276,105,8
+    EDITTEXT        IDC_RP_REFER_EDIT,30,289,312,30,ES_AUTOHSCROLL
+    LTEXT           "Máximo 200 caracteres",IDC_STATIC,264,324,75,8
+    GROUPBOX        "Lista de pacientes",IDC_STATIC,390,108,204,234
+    LTEXT           "Primer médico que lo atendió",IDC_STATIC,30,240,92,8
+    COMBOBOX        IDC_RP_FIRSTDR_COMBO,126,240,120,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_PATIENT_LIST,408,126,168,144,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Ver información de la selección",IDC_RP_LOOKPATIENT_CMD,408,282,168,14
+    PUSHBUTTON      "Generar reporte de pacientes",IDC_RP_GENREPORT_CMD,408,318,168,14
+    PUSHBUTTON      "Eliminar registro de paciente",IDC_RP_DELETEREG_CMD,408,300,168,14
+    GROUPBOX        "",IDC_STATIC,390,6,204,60
+    PUSHBUTTON      "Registrar paciente",IDC_RP_REGPATIENT_CMD,408,18,168,14
+    PUSHBUTTON      "Borrar todos los campos",IDC_RP_CLEARREG_CMD,408,42,168,14
+    LTEXT           "Errores: No hay errores",IDC_RP_ERROR_LOG,408,72,168,30,0,WS_EX_STATICEDGE
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_MAIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 593
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 373
+    END
+
+    IDD_REG_APP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 593
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 343
+    END
+
+    IDD_QUERY_APP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 593
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 343
+    END
+
+    IDD_REG_MED, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 593
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 343
+    END
+
+    IDD_REG_SPE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 593
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 343
+    END
+
+    IDD_REG_PATIENT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 593
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 343
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_MAIN AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_REG_APP AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_QUERY_APP AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_REG_MED AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_REG_SPE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_REG_PATIENT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAIN_MENU MENU
+BEGIN
+    POPUP "&Citas"
+    BEGIN
+        MENUITEM "&Registro de citas",          CMD_REG_APP
+        MENUITEM "C&onsulta de citas",          CMD_QUERY_APP
+    END
+    MENUITEM "Registro de &pacientes",      CMD_REG_PATIENT
+    MENUITEM "Registro de &médicos",        CMD_REG_MED
+    MENUITEM "Registro de &especialidad",   40007
+    MENUITEM "&Salir",                      40010
+END
+
+#endif    // Español (México) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
