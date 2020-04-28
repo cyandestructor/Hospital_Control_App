@@ -452,6 +452,8 @@ void List<T>::QuickSort() {
 			this->Enqueue(arr[i]);
 		}
 
+		delete[] arr;
+
 	}
 
 }
@@ -459,7 +461,7 @@ void List<T>::QuickSort() {
 template <typename T>
 void List<T>::InternQuickSort(T arr[], int l, int r) {
 
-	int i = l,
+	unsigned int i = l,
 		j = r,
 		pivot = (int)((l + r) * 0.5);
 
