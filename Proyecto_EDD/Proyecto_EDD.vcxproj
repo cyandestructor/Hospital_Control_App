@@ -145,6 +145,7 @@
     <ClInclude Include="DateTime.h" />
     <ClInclude Include="Doctor.h" />
     <ClInclude Include="HasString.h" />
+    <ClInclude Include="Heap.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="MedOffice.h" />
     <ClInclude Include="Patient.h" />

@@ -51,7 +51,10 @@ std::wstring Person::GetName(const Names name) const {
 		returnedName = m_secondLastname;
 		break;
 	case Names::FULL_NAME:
-		returnedName = m_firstName + m_secondName + m_firstLastname + m_secondLastname;
+		returnedName = m_firstName + L" " + m_secondName + L" " + m_firstLastname + L" " + m_secondLastname;
+		break;
+	case Names::LASTNAME_FIRST:
+		returnedName = m_firstLastname + L" " + m_secondLastname + L" " + m_firstName + L" " + m_secondName;
 		break;
 	default:
 		returnedName = L"UNDEFINED";

@@ -36,6 +36,7 @@ public:
 	const T& GetElement(unsigned int index) const;
 	void ForEach(void(*doFunc)(T&));
 	void ForEach(const std::function<void(T&)>& doFunc);
+	T* GetArray();
 	bool ReadFromFile(const std::wstring& filePath);
 	bool WriteToFile(const std::wstring& filePath);
 	template <typename U> T& Search(const U& key, bool (*condition)(const T&, const U&));
@@ -426,6 +427,26 @@ void List<T>::ForEach(const std::function<void(T&)>& doFunc) {
 		doFunc(aux->content);
 		aux = aux->next;
 	}
+
+}
+
+template <typename T>
+T* List<T>::GetArray() {
+
+	T* listArray = nullptr;
+
+	if (!this->IsEmpty()) {
+		listArray = new T[this->m_size];
+
+		Node<T>* aux = this->m_head;
+		for (unsigned int i = 0; i < this->m_size; i++) {
+			listArray[i] = aux->content;
+			aux = aux->next;
+		}
+
+	}
+
+	return listArray;
 
 }
 

@@ -5,6 +5,7 @@
 #include <KnownFolders.h>
 #include <ShlObj.h>
 #include "resource.h"
+#include "Heap.h"
 
 #pragma comment (lib, "Comctl32.lib")
 
@@ -400,37 +401,6 @@ void ClearAppRegister(HWND hWnd) {
 
 }
 
-void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstring& filePath) {
-
-	std::ofstream file;
-	//Create doctor list
-	List<Doctor> drList;
-	drBST.ExecutePostorder([&](Doctor& doc) {
-		drList.Push(doc);
-		});
-	//Quicksort the list
-	drList.QuickSort();
-	//Write the data in the file
-	file.open(filePath, ios::out | ios::trunc);
-
-	if (file.is_open()) {
-		drList.ForEach([&](Doctor& dr) {
-			file << dr.ProfessionalID().c_str() << L" "
-				<< dr.GetName(Names::FULL_NAME).c_str() << L" "
-				<< dr.GetPhoneNumber().PhoneNumberString(false).c_str() << std::endl;
-			});
-
-		file.close();
-		MessageBoxW(hWnd, L"Información de Archivo",
-			L"El reporte se ha guardado con éxito.", MB_ICONEXCLAMATION | MB_OK);
-	}
-	else {
-		MessageBoxW(hWnd, L"Error al guardar", 
-			L"No se ha podido guardar el reporte.", MB_ICONERROR | MB_OK);
-	}
-
-}
-
 void SelectPatient(HWND hWnd, int comboBoxID, List<Patient>& patList) {
 
 	unsigned int key = GetKeyFromCB(hWnd, comboBoxID);
@@ -749,6 +719,37 @@ bool GetImageFilename(HWND parent, std::wstring& buffer) {
 
 }
 
+void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstring& filePath) {
+
+	std::ofstream file;
+	//Create doctor list
+	List<Doctor> drList;
+	drBST.ExecutePostorder([&](Doctor& doc) {
+		drList.Push(doc);
+		});
+	//Quicksort the list
+	drList.QuickSort();
+	//Write the data in the file
+	file.open(filePath, ios::out | ios::trunc);
+
+	if (file.is_open()) {
+		drList.ForEach([&](Doctor& dr) {
+			file << dr.ProfessionalID().c_str() << L" "
+				<< dr.GetName(Names::FULL_NAME).c_str() << L" "
+				<< dr.GetPhoneNumber().PhoneNumberString(false).c_str() << std::endl;
+			});
+
+		file.close();
+		MessageBoxW(hWnd, L"Información de Archivo",
+			L"El reporte se ha guardado con éxito.", MB_ICONEXCLAMATION | MB_OK);
+	}
+	else {
+		MessageBoxW(hWnd, L"Error al guardar",
+			L"No se ha podido guardar el reporte.", MB_ICONERROR | MB_OK);
+	}
+
+}
+
 #pragma endregion Register_Doctor_Window
 
 #pragma region Reg_Patient_Window
@@ -788,6 +789,31 @@ void InitRegPatientControls(HWND hWnd, void(*initWithGlobals)(HWND)) {
 			SendDlgItemMessageW(hWnd, IDC_RP_BLOOD_COMBO, CB_ADDSTRING, NULL, (LPARAM)bloodTypes[i]);
 		}
 
+	}
+
+}
+
+void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& filepath) {
+
+	Patient* patArray = patList.GetArray();
+	size_t size = patList.Size();
+
+	if (patArray) {
+		ofstream file;
+		file.open(filepath, ios::out | ios::trunc);
+
+		if (file.is_open()) {
+
+			Heap<Patient>::HeapSort(patArray, size, HeapType::MIN_H);
+
+			for (size_t i = 0; i < size; i++) {
+				file << patArray[i].GetName(Names::LASTNAME_FIRST).c_str() << std::endl;
+			}
+
+			file.close();
+		}
+
+		delete patArray;
 	}
 
 }
