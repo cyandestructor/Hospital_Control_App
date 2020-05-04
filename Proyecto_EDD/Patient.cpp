@@ -154,3 +154,39 @@ void Patient::Read(std::istream& is) {
 	is.read(reinterpret_cast<char*>(&m_doctor), sizeof(unsigned long));
 
 }
+
+bool operator==(const Patient& one, const Patient& two) {
+
+	return one.GetName(Names::LASTNAME_FIRST) == two.GetName(Names::LASTNAME_FIRST);
+
+}
+
+bool operator!=(const Patient& one, const Patient& two) {
+
+	return !(one == two);
+
+}
+
+bool operator<(const Patient& one, const Patient& two) {
+
+	return  one.GetName(Names::LASTNAME_FIRST) < two.GetName(Names::LASTNAME_FIRST);
+
+}
+
+bool operator<=(const Patient& one, const Patient& two) {
+
+	return !(one > two);
+
+}
+
+bool operator>(const Patient& one, const Patient& two) {
+
+	return  one.GetName(Names::LASTNAME_FIRST) > two.GetName(Names::LASTNAME_FIRST);
+
+}
+
+bool operator>=(const Patient& one, const Patient& two) {
+
+	return !(one < two);
+
+}

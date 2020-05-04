@@ -28,6 +28,13 @@ public:
 	void Write(std::ostream& os);
 	void Read(std::istream& is);
 
+	friend bool operator==(const Patient& one, const Patient& two);
+	friend bool operator!=(const Patient& one, const Patient& two);
+	friend bool operator<(const Patient& one, const Patient& two);
+	friend bool operator<=(const Patient& one, const Patient& two);
+	friend bool operator>(const Patient& one, const Patient& two);
+	friend bool operator>=(const Patient& one, const Patient& two);
+
 private:
 	mutable unsigned int m_key;
 	unsigned short m_height;
