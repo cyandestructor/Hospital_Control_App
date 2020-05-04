@@ -279,6 +279,7 @@ BOOL CALLBACK RegPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		case IDC_RP_DELETEREG_CMD:
 			break;
 		case IDC_RP_GENREPORT_CMD:
+			SavePatientReport(hWnd, g_patientList);
 			break;
 
 		}
@@ -328,6 +329,7 @@ BOOL CALLBACK RegMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		case IDC_RM_DELETEREG_CMD:
 			break;
 		case IDC_RM_GENREPORT_CMD:
+			SaveDoctorReport(hWnd, g_doctorBST);
 			break;
 		}
 

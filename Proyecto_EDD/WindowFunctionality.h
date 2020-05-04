@@ -42,6 +42,7 @@ ValidationError ValidateDoctorRegister(HWND hWnd);
 void ClearDoctorRegister(HWND hWnd);
 void LoadDoctorImg(HWND hWnd, int width, int height);
 bool GetImageFilename(HWND parent, std::wstring& buffer);
+void SaveDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST);
 void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstring& filePath);
 
 //Register Patient Window
@@ -50,6 +51,7 @@ void InitRegPatientControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetPatientRegisterInfo(HWND hWnd, Patient& patient);
 ValidationError ValidatePatientRegister(HWND hWnd);
 void ClearPatientRegister(HWND hWnd);
+void SavePatientReport(HWND hWnd, List<Patient>& patList);
 void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& filepath);
 
 //Register Speciality Window

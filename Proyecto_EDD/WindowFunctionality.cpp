@@ -719,6 +719,30 @@ bool GetImageFilename(HWND parent, std::wstring& buffer) {
 
 }
 
+void SaveDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
+
+	//Fill the open file name structure
+
+	OPENFILENAMEW ofn;
+	ZeroMemory(&ofn, sizeof(OPENFILENAMEW));
+
+	wchar_t filepath[MAX_PATH] = L"DOCTOR_REPORT";
+
+	ofn.lStructSize = sizeof(OPENFILENAMEW);
+	ofn.hwndOwner = hWnd;
+	ofn.lpstrFilter = L"Text Files (*.txt)\0*.TXT\0";
+	ofn.lpstrFile = filepath;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrDefExt = L"TXT";
+	ofn.lpstrInitialDir = DocumentsDirectory().c_str();
+	ofn.Flags = OFN_EXPLORER | OFN_DONTADDTORECENT | OFN_HIDEREADONLY | OFN_NOREADONLYRETURN;
+
+	if (GetSaveFileNameW(&ofn)) {
+		GenDoctorReport(hWnd, drBST, filepath);
+	}
+
+}
+
 void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstring& filePath) {
 
 	std::ofstream file;
@@ -727,25 +751,32 @@ void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstr
 	drBST.ExecutePostorder([&](Doctor& doc) {
 		drList.Push(doc);
 		});
-	//Quicksort the list
-	drList.QuickSort();
-	//Write the data in the file
-	file.open(filePath, ios::out | ios::trunc);
+	
+	if (!drList.IsEmpty()) {
+		//Quicksort the list
+		drList.QuickSort();
+		//Write the data in the file
+		file.open(filePath, ios::out | ios::trunc);
 
-	if (file.is_open()) {
-		drList.ForEach([&](Doctor& dr) {
-			file << dr.ProfessionalID().c_str() << L" "
-				<< dr.GetName(Names::FULL_NAME).c_str() << L" "
-				<< dr.GetPhoneNumber().PhoneNumberString(false).c_str() << std::endl;
-			});
+		if (file.is_open()) {
+			drList.ForEach([&](Doctor& dr) {
+				file << dr.ProfessionalID().c_str() << L" "
+					<< dr.GetName(Names::FULL_NAME).c_str() << L" "
+					<< dr.GetPhoneNumber().PhoneNumberString(false).c_str() << std::endl;
+				});
 
-		file.close();
-		MessageBoxW(hWnd, L"Información de Archivo",
-			L"El reporte se ha guardado con éxito.", MB_ICONEXCLAMATION | MB_OK);
+			file.close();
+			MessageBoxW(hWnd, L"Información de Archivo",
+				L"El reporte se ha guardado con éxito.", MB_ICONEXCLAMATION | MB_OK);
+		}
+		else {
+			MessageBoxW(hWnd, L"Error al guardar",
+				L"No se ha podido guardar el reporte.", MB_ICONERROR | MB_OK);
+		}
 	}
 	else {
 		MessageBoxW(hWnd, L"Error al guardar",
-			L"No se ha podido guardar el reporte.", MB_ICONERROR | MB_OK);
+			L"No hay información para guardar.", MB_ICONERROR | MB_OK);
 	}
 
 }
@@ -793,6 +824,30 @@ void InitRegPatientControls(HWND hWnd, void(*initWithGlobals)(HWND)) {
 
 }
 
+void SavePatientReport(HWND hWnd, List<Patient>& patList) {
+
+	//Fill the open file name structure
+
+	OPENFILENAMEW ofn;
+	ZeroMemory(&ofn, sizeof(OPENFILENAMEW));
+
+	wchar_t filepath[MAX_PATH] = L"PATIENT_REPORT";
+
+	ofn.lStructSize = sizeof(OPENFILENAMEW);
+	ofn.hwndOwner = hWnd;
+	ofn.lpstrFilter = L"Text Files (*.txt)\0*.TXT\0";
+	ofn.lpstrFile = filepath;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrDefExt = L"TXT";
+	ofn.lpstrInitialDir = DocumentsDirectory().c_str();
+	ofn.Flags = OFN_EXPLORER | OFN_DONTADDTORECENT | OFN_HIDEREADONLY | OFN_NOREADONLYRETURN;
+
+	if (GetSaveFileNameW(&ofn)) {
+		GenPatientReport(hWnd, patList, filepath);
+	}
+
+}
+
 void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& filepath) {
 
 	Patient* patArray = patList.GetArray();
@@ -811,9 +866,19 @@ void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& fil
 			}
 
 			file.close();
+			MessageBoxW(hWnd, L"Información de Archivo",
+				L"El reporte se ha guardado con éxito.", MB_ICONEXCLAMATION | MB_OK);
+		}
+		else {
+			MessageBoxW(hWnd, L"Error al guardar",
+				L"No se ha podido guardar el reporte.", MB_ICONERROR | MB_OK);
 		}
 
 		delete patArray;
+	}
+	else {
+		MessageBoxW(hWnd, L"Error al guardar",
+			L"No hay información para guardar.", MB_ICONERROR | MB_OK);
 	}
 
 }
