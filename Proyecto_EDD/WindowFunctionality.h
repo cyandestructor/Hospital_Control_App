@@ -29,6 +29,7 @@ void SelectQueryType(HWND hWnd, int comboBoxID);
 void InitRegAppControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetAppRegisterInfo(HWND hWnd, Appointment& app);
 ValidationError ValidateAppRegister(HWND hWnd);
+void ReserveDoubleApp(HWND hWnd);	//TODO
 void ClearAppRegister(HWND hWnd);
 void SelectPatient(HWND hWnd, int comboBoxID, List<Patient>& patList);
 void SelectDoctor(HWND hWnd, int comboBoxID, BinarySearchTree<Doctor>& drList);
@@ -39,9 +40,12 @@ void FilterDoctorsWithSpeciality(HWND hWnd, BinarySearchTree<Doctor>& drBST);
 void InitRegMedControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetDoctorRegisterInfo(HWND hWnd, Doctor& doctor);
 ValidationError ValidateDoctorRegister(HWND hWnd);
+void ValidateDoctorPerMO(HWND hWnd);	//TODO
 void ClearDoctorRegister(HWND hWnd);
 void LoadDoctorImg(HWND hWnd, int width, int height);
 bool GetImageFilename(HWND parent, std::wstring& buffer);
+void ViewSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST);	//TODO
+void DeleteSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST);	//TODO
 void SaveDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST);
 void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstring& filePath);
 
@@ -51,6 +55,8 @@ void InitRegPatientControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetPatientRegisterInfo(HWND hWnd, Patient& patient);
 ValidationError ValidatePatientRegister(HWND hWnd);
 void ClearPatientRegister(HWND hWnd);
+void ViewSelectedPatient(HWND hWnd);	//TODO
+void DeleteSelectedPatient(HWND hWnd, List<Patient>& patList);	//TODO
 void SavePatientReport(HWND hWnd, List<Patient>& patList);
 void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& filepath);
 
@@ -60,6 +66,9 @@ void InitRegSpeControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetSpeRegisterInfo(HWND hWnd, Speciality& speciality);
 ValidationError ValidateSpeRegister(HWND hWnd);
 void ClearSpeRegister(HWND hWnd);
+void ViewSelectedSpeciality(HWND hWnd);	//TODO
+void DeleteSelectedSpeciality(HWND hWnd, List<Speciality>& speList, BinarySearchTree<Doctor>& drBST);
+unsigned int DoctorsPerSpeciality(unsigned int key, BinarySearchTree<Doctor>& drBST, std::vector<Doctor>* buffer = 0);
 
 //File Management
 
@@ -84,7 +93,9 @@ void InterpretValidationError(const ValidationError& toInterpret, bool setFocus,
 void SetPictureControlImg(const wchar_t* filePath, int width, int height, HWND hWnd, int pictureControlId = 0);
 unsigned int GetKeyFromWstring(const std::wstring& wstring);
 int ComboBoxGetWstring(std::wstring& buffer, int index, HWND hWnd, int cbID = 0);
+int ListBoxGetWstring(std::wstring& buffer, int index, HWND hWnd, int lbID = 0);
 unsigned int GetKeyFromCB(HWND hWnd, int cbID = 0);
+unsigned int GetKeyFromLB(HWND hWnd, int lbID = 0);
 unsigned long GetIDFromCB(HWND hWnd, int cbID = 0);
 std::wstring DocumentsDirectory();
 

@@ -34,7 +34,7 @@ public:
 	T Dequeue();
 	T& GetElement(unsigned int index);
 	const T& GetElement(unsigned int index) const;
-	void ForEach(void(*doFunc)(T&));
+	//void ForEach(void(*doFunc)(T&));
 	void ForEach(const std::function<void(T&)>& doFunc);
 	T* GetArray();
 	bool ReadFromFile(const std::wstring& filePath);
@@ -52,7 +52,7 @@ private:
 	Node<T> *m_head, *m_tail;
 	unsigned int m_size;
 
-	void InternQuickSort(T arr[], int l, int r);
+	void InternQuickSort(T arr[], unsigned int l, unsigned int r);
 
 };
 
@@ -408,16 +408,16 @@ const T& List<T>::GetElement(unsigned int index) const {
 
 }
 
-template<typename T>
-void List<T>::ForEach(void(*doFunc)(T&)) {
-
-	Node<T>* aux = m_head;
-	for (unsigned int i = 0; i < m_size; i++) {
-		doFunc(aux->content);
-		aux = aux->next;
-	}
-
-}
+//template<typename T>
+//void List<T>::ForEach(void(*doFunc)(T&)) {
+//
+//	Node<T>* aux = m_head;
+//	for (unsigned int i = 0; i < m_size; i++) {
+//		doFunc(aux->content);
+//		aux = aux->next;
+//	}
+//
+//}
 
 template <typename T>
 void List<T>::ForEach(const std::function<void(T&)>& doFunc) {
@@ -480,7 +480,7 @@ void List<T>::QuickSort() {
 }
 
 template <typename T>
-void List<T>::InternQuickSort(T arr[], int l, int r) {
+void List<T>::InternQuickSort(T arr[], unsigned int l, unsigned int r) {
 
 	unsigned int i = l,
 		j = r,

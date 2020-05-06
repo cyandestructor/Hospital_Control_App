@@ -149,6 +149,23 @@ int ComboBoxGetWstring(std::wstring& buffer, int index, HWND hWnd, int cbID) {
 
 }
 
+int ListBoxGetWstring(std::wstring& buffer, int index, HWND hWnd, int lbID = 0) {
+
+	HWND listBox = hWnd;
+	int textL;
+
+	if (lbID != 0)
+		listBox = GetDlgItem(hWnd, lbID);
+
+	textL = (int)SendMessageW(hWnd, LB_GETTEXTLEN, index, NULL);
+	buffer.resize(textL + 1);
+	SendMessageW(hWnd, LB_GETTEXT, index, (LPARAM)&buffer[0]);
+	buffer.resize(textL);
+
+	return textL;
+
+}
+
 unsigned int GetKeyFromCB(HWND hWnd, int cbID) {
 
 	HWND comboBox = hWnd;
@@ -162,6 +179,26 @@ unsigned int GetKeyFromCB(HWND hWnd, int cbID) {
 	if (sel != CB_ERR) {
 		std::wstring aux;
 		ComboBoxGetWstring(aux, sel, comboBox);
+		key = GetKeyFromWstring(aux);
+	}
+
+	return key;
+
+}
+
+unsigned int GetKeyFromLB(HWND hWnd, int lbID) {
+
+	HWND listBox = hWnd;
+	unsigned int key = 0;
+
+	if (lbID != 0)
+		listBox = GetDlgItem(hWnd, lbID);
+
+	int sel = SendMessageW(listBox, CB_GETCURSEL, NULL, NULL);
+
+	if (sel != CB_ERR) {
+		std::wstring aux;
+		ListBoxGetWstring(aux, sel, listBox);
 		key = GetKeyFromWstring(aux);
 	}
 
@@ -442,19 +479,30 @@ void FilterDoctorsWithSpeciality(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
 	//Get the speciality key
 	unsigned int key = GetKeyFromCB(hWnd, IDC_RA_SELSPE_COMBO);
 	//Get the doctors with that speciality
-	drBST.ExecutePreorder([&](Doctor& dr) {
-		if (dr.GetSpeciality() == key)
-			tempList.Push(dr);	//Save in the list
-		});
+	std::vector<Doctor> buffer;
+	DoctorsPerSpeciality(key, drBST, &buffer);
+
+	//drBST.ExecutePreorder([&](Doctor& dr) {
+	//	if (dr.GetSpeciality() == key)
+	//		tempList.Push(dr);	//Save in the list
+	//	});
+
 	//Restart the combo box
 	SendDlgItemMessageW(hWnd, IDC_RA_SELDR_COMBO, CB_RESETCONTENT, NULL, NULL);
 	//Add the doctors with that speciality
-	tempList.ForEach([&](Doctor& doc) {
+	for (Doctor& doc : buffer) {
 		std::wstring aux = doc.ProfessionalID() + L" "
 			+ doc.GetName(Names::FIRST_NAME) + L" "
 			+ doc.GetName(Names::FIRST_LASTNAME);
 		SendDlgItemMessageW(hWnd, IDC_RA_SELDR_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
+	}
+
+	/*tempList.ForEach([&](Doctor& doc) {
+		std::wstring aux = doc.ProfessionalID() + L" "
+			+ doc.GetName(Names::FIRST_NAME) + L" "
+			+ doc.GetName(Names::FIRST_LASTNAME);
+		SendDlgItemMessageW(hWnd, IDC_RA_SELDR_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		});*/
 
 }
 
@@ -1056,6 +1104,49 @@ void ClearSpeRegister(HWND hWnd) {
 	//clear edit controls
 	SetDlgItemTextW(hWnd, IDC_RS_SPENAME_EDIT, L"");
 	SetDlgItemTextW(hWnd, IDC_RS_SPEDESC_EDIT, L"");
+
+}
+
+void DeleteSelectedSpeciality(HWND hWnd, List<Speciality>& speList, BinarySearchTree<Doctor>& drBST) {
+
+	unsigned int key = GetKeyFromLB(hWnd, IDC_SPE_LIST);
+	int deleted = -1, i = 0;
+
+	if (DoctorsPerSpeciality(key, drBST) == 0) {
+
+		//Find the element with that key
+		speList.ForEach([&](Speciality& spe) {
+			if (spe.Key() == key)
+				deleted = i;	//if found: save the current index
+			i++;
+			});
+
+		if (deleted > -1)
+			speList.Delete((unsigned int)deleted);
+
+	}
+	else {
+		//Speciality cannot be deleted because there are doctors registered with that speciality
+		MessageBoxW(hWnd, L"No se ha podido eliminar", L"Uno o más doctores registrados con esta especialidad.",
+			MB_ICONERROR | MB_OK);
+	}
+
+}
+
+unsigned int DoctorsPerSpeciality(unsigned int key, BinarySearchTree<Doctor>& drBST, std::vector<Doctor>* buffer) {
+
+	unsigned int count = 0;
+
+	//Count the doctors with that speciality
+	drBST.ExecutePreorder([&](Doctor& dr) {
+		if (dr.GetSpeciality() == key) {
+			count++;
+			if (buffer)	//If the buffer has been specified
+				buffer->push_back(dr);
+		}
+		});
+
+	return count;
 
 }
 
