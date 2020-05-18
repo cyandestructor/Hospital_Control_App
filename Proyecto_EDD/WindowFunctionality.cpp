@@ -149,7 +149,7 @@ int ComboBoxGetWstring(std::wstring& buffer, int index, HWND hWnd, int cbID) {
 
 }
 
-int ListBoxGetWstring(std::wstring& buffer, int index, HWND hWnd, int lbID = 0) {
+int ListBoxGetWstring(std::wstring& buffer, int index, HWND hWnd, int lbID) {
 
 	HWND listBox = hWnd;
 	int textL;
@@ -196,7 +196,7 @@ unsigned int GetKeyFromLB(HWND hWnd, int lbID) {
 
 	int sel = SendMessageW(listBox, CB_GETCURSEL, NULL, NULL);
 
-	if (sel != CB_ERR) {
+	if (sel != LB_ERR) {
 		std::wstring aux;
 		ListBoxGetWstring(aux, sel, listBox);
 		key = GetKeyFromWstring(aux);
@@ -218,6 +218,26 @@ unsigned long GetIDFromCB(HWND hWnd, int cbID) {
 
 	if (sel != CB_ERR) {
 		ComboBoxGetWstring(aux, sel, comboBox);
+		int spaceIndex = aux.find_first_of(L' ');
+		return std::stoul(aux.substr(0, spaceIndex));
+	}
+
+	return 0;
+
+}
+
+unsigned long GetIDFromLB(HWND hWnd, int lbID) {
+
+	HWND listBox = hWnd;
+	std::wstring aux;
+
+	if (lbID != 0)
+		listBox = GetDlgItem(hWnd, lbID);
+
+	int sel = SendMessageW(listBox, LB_GETCURSEL, NULL, NULL);
+
+	if (sel != LB_ERR) {
+		ListBoxGetWstring(aux, sel, listBox);
 		int spaceIndex = aux.find_first_of(L' ');
 		return std::stoul(aux.substr(0, spaceIndex));
 	}
@@ -415,6 +435,12 @@ ValidationError ValidateAppRegister(HWND hWnd) {
 
 }
 
+void ReserveDoubleApp(HWND hWnd) {
+
+
+
+}
+
 void ClearAppRegister(HWND hWnd) {
 
 	//deselect combo boxes
@@ -435,6 +461,22 @@ void ClearAppRegister(HWND hWnd) {
 
 	//restart check box
 	SendDlgItemMessageW(hWnd, IDC_RA_DOUBLEAPP_CHECK, BM_SETCHECK, BST_UNCHECKED, NULL);
+
+}
+
+Patient& FindPatientWithKey(List<Patient>& patList, unsigned int key) {
+
+	return patList.Search<unsigned int>(key, [](const Patient& pat, const unsigned int& s_key) {
+		return pat.Key() == s_key;
+		});
+
+}
+
+void ViewSelectedPatient(HWND hWnd) {
+
+	unsigned int key = GetKeyFromLB(hWnd, IDC_PATIENT_LIST);
+
+	//TODO: Create view dialog
 
 }
 
@@ -671,6 +713,36 @@ ValidationError ValidateDoctorRegister(HWND hWnd) {
 
 }
 
+bool ValidateDoctorPerMO(HWND hWnd, BinarySearchTree<Doctor>& drBST, Doctor& toValidate) {
+	
+	std::vector<Doctor> doctorsInMO;
+
+	//Get the selected medical office number
+	unsigned int moKey = GetKeyFromCB(hWnd, IDC_RM_MO_COMBO);
+	
+	//Get all doctors in that medical office
+	drBST.ExecuteInorder([&](Doctor& dr) {
+		if (dr.GetMedOfficeNum() == moKey)
+			doctorsInMO.push_back(dr);
+		});
+
+	//Check if there are conflicts with the schedules of those doctors and the new one
+	bool conflict = false;
+	for (auto& doctor : doctorsInMO) {
+		if (doctor.GetSchedule().ConflictWith(toValidate.GetSchedule(),SchValidate::SCH_ALL)) {
+			conflict = true;
+			break;
+		}
+	}
+
+	if (conflict) {
+		MessageBoxW(hWnd, L"Error", L"Ya hay un doctor en el mismo horario y consultorio",
+			MB_ICONERROR | MB_OK);
+		return conflict;
+	}
+
+}
+
 void ClearDoctorRegister(HWND hWnd) {
 
 	{	//Clear edit controls
@@ -764,6 +836,30 @@ bool GetImageFilename(HWND parent, std::wstring& buffer) {
 	}
 
 	return result;
+
+}
+
+void ViewSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
+
+	unsigned long id = GetIDFromLB(hWnd, IDC_DR_LIST);
+
+	Doctor key(id);
+
+	if (drBST.BinarySearch(key, key)) {
+		//TODO: CREATE THE VIEW DIALOG
+	}
+
+}
+
+void DeleteSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
+
+	unsigned long id = GetIDFromLB(hWnd, IDC_DR_LIST);
+
+	Doctor key(id);
+
+	drBST.Delete(key);
+
+	//TODO: UPDATE LIST
 
 }
 
