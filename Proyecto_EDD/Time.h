@@ -13,7 +13,7 @@ public:
 	Time(unsigned short hour, unsigned short minute);
 	Time(const SYSTEMTIME& systemTime);
 	void SetTime(unsigned short hour, unsigned short minute);
-	virtual void AddTime(unsigned short hour, unsigned short minute);
+	unsigned short AddTime(unsigned short hour, unsigned short minute);
 	unsigned short Hour() const;
 	unsigned short Minute() const;
 

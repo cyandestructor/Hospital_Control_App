@@ -14,28 +14,11 @@ SYSTEMTIME DateTime::GetSystemTimeStruct() const {
 
 }
 
-void DateTime::AddTime(unsigned short hour, unsigned short minute) {
+void DateTime::AddTime(unsigned short day, unsigned short month, unsigned short year,
+	unsigned short hour, unsigned short minute) {
 
-	short addHour = (short)(minute / 60);
-	short addMinute = minute % 60;
-	short addDay = 0;
-
-	addHour = (addHour + hour) % 24;
-	addDay = (short)(addHour / 24);
-
-	m_minute += addMinute;
-	if (m_minute >= 60) {
-		addHour++;
-		m_minute -= 60;
-	}
-
-	m_hour += addHour;
-	if (m_hour >= 24) {
-		addDay++;
-		m_hour -= 24;
-	}
-
-	m_day += addDay;
+	unsigned short addDays = Time::AddTime(hour, minute);
+	Date::AddTime(day + addDays, month, year);
 
 }
 

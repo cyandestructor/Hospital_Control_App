@@ -27,12 +27,14 @@ void Time::SetTime(unsigned short hour, unsigned short minute) {
 
 }
 
-void Time::AddTime(unsigned short hour, unsigned short minute) {
+unsigned short Time::AddTime(unsigned short hour, unsigned short minute) {
 
-	short addHour = (short)(minute / 60);
-	short addMinute = minute % 60;
+	unsigned short addHour = (unsigned short)(minute / 60);
+	unsigned short addMinute = minute % 60;
+	unsigned short addDay = (unsigned short)(hour / 24);
 
 	addHour = (addHour + hour) % 24;
+	//addDay = (unsigned short)(addHour / 24);
 
 	m_minute += addMinute;
 	if (m_minute >= 60) {
@@ -42,8 +44,11 @@ void Time::AddTime(unsigned short hour, unsigned short minute) {
 
 	m_hour += addHour;
 	if (m_hour >= 24) {
+		addDay++;
 		m_hour -= 24;
 	}
+
+	return addDay;
 
 }
 
