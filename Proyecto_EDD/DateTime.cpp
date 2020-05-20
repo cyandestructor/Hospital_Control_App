@@ -43,6 +43,18 @@ const DateTime DateTime::RightNow() {
 
 }
 
+const DateTime DateTime::DateTimeAdd(const DateTime& orig, 
+	unsigned short day, unsigned short month, unsigned short year,
+	unsigned short hour, unsigned short minute) {
+
+	DateTime dt = orig;
+
+	dt.AddTime(day, month, year, hour, minute);
+
+	return dt;
+
+}
+
 bool operator<(const DateTime& firstDateTime, const DateTime& secondDateTime) {
 
 	if (firstDateTime.CompareWith(secondDateTime) == -1) {

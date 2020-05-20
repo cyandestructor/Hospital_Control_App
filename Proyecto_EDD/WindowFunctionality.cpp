@@ -363,6 +363,10 @@ void GetAppRegisterInfo(HWND hWnd, Appointment& app) {
 	date.wMinute = time.wMinute;
 	app.SetAppointmentDateTime(DateTime(date));
 
+	//Get if it is a double appointment
+	bool isDouble = (bool)SendDlgItemMessageW(hWnd, IDC_RA_DOUBLEAPP_CHECK, BM_GETCHECK, NULL, NULL);
+	app.SetDouble(isDouble);
+
 	//Get Medical office
 	app.SetMedOffice(GetKeyFromCB(hWnd, IDC_RA_SELMO_COMBO));
 
@@ -435,9 +439,41 @@ ValidationError ValidateAppRegister(HWND hWnd) {
 
 }
 
-void ReserveDoubleApp(HWND hWnd) {
+void ReserveApp(const Appointment& app, List<Appointment>& appList, List<MedOffice>& moList) {
 
+	//Get the info of the selected medical office
+	MedOffice selMO = app.GetMedOffice(moList);
+	
+	DateTime beginTime = app.GetDateTime(), endTime = app.GetDateTime();
+	bool error = false;
 
+	if (app.IsDouble()) {
+
+		endTime.AddTime(0, 0, 0, 0, 40);	//Add the 40 minutes for the two appointments
+
+		if (selMO.GetSchedule().IsAvailable(beginTime, endTime))
+			selMO.GetSchedule().Reserve(beginTime, endTime);
+		else
+			error = true;
+	}
+	else {
+
+		endTime.AddTime(0, 0, 0, 0, 20);	//Add the 20 minutes for the appointment
+
+		if (selMO.GetSchedule().IsAvailable(beginTime, endTime))
+			selMO.GetSchedule().Reserve(beginTime, endTime);
+		else
+			error = true;
+
+	}
+
+	if (error) {
+		MessageBoxW(NULL, L"Error", L"Ya hay una cita a esa hora", MB_ICONERROR | MB_OK);
+	}
+	else {
+		appList.Push(app);
+		MessageBoxW(NULL, L"Reserva", L"Se he reservado la cita", MB_ICONEXCLAMATION | MB_OK);
+	}
 
 }
 

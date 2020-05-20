@@ -18,6 +18,9 @@ public:
 	int CompareWith(const DateTime& other) const;
 
 	static const DateTime RightNow();
+	static const DateTime DateTimeAdd(const DateTime& orig, 
+		unsigned short day, unsigned short month, unsigned short year,
+		unsigned short hour, unsigned short minute);
 
 	friend bool operator==(const DateTime& firstDateTime, const DateTime& secondDateTime);
 	friend bool operator!=(const DateTime& firstDateTime, const DateTime& secondDateTime);

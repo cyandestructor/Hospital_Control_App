@@ -24,6 +24,8 @@ public:
 	const MedOffice& GetMedOffice(List<MedOffice>& medOffList) const;
 	void SetDescription(std::wstring& description);
 	const std::wstring& GetDescription() const;
+	void SetDouble(bool isDouble) { m_isDouble = isDouble; }
+	bool IsDouble()const { return m_isDouble; }
 	unsigned int Key() const;
 	void Write(std::ostream& os);
 	void Read(std::istream& is);
@@ -33,6 +35,7 @@ private:
 	unsigned int m_patientKey;
 	unsigned int m_medOfficeKey;
 	unsigned long m_doctorID;
+	bool m_isDouble;
 	DateTime m_dateTime;
 	PhoneNumber m_phoneNumber;
 	std::wstring m_description;

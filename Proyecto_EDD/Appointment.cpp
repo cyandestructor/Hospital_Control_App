@@ -3,6 +3,7 @@
 Appointment::Appointment() {
 
 	m_doctorID = m_key = m_medOfficeKey = m_patientKey = 0;
+	m_isDouble = false;
 
 }
 

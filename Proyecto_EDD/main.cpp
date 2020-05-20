@@ -165,7 +165,7 @@ BOOL CALLBACK RegAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			validationError = ValidateAppRegister(hWnd);
 			if (validationError.errorCode == ErrorCode::EC_NO_ERROR) {
 				GetAppRegisterInfo(hWnd, app);	//Get info from controls
-				g_appList.Push(app);
+				ReserveApp(app, g_appList, g_medOffList);
 				ClearAppRegister(hWnd);
 			}
 			else {
