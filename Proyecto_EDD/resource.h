@@ -10,6 +10,8 @@
 #define IDD_REG_MED                     106
 #define IDD_REG_SPE                     107
 #define IDD_REG_PATIENT                 108
+#define IDD_REG_APP1                    109
+#define IDD_VIEW_APP                    109
 #define IDC_COMBO1                      1002
 #define IDC_RP_GENDER_COMBO             1002
 #define IDC_COMBO2                      1003
@@ -154,7 +156,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        108
+#define _APS_NEXT_RESOURCE_VALUE        111
 #define _APS_NEXT_COMMAND_VALUE         40011
 #define _APS_NEXT_CONTROL_VALUE         1082
 #define _APS_NEXT_SYMED_VALUE           101

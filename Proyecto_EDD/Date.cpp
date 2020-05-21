@@ -79,6 +79,12 @@ void Date::AddTime(unsigned short days, unsigned short months, unsigned short ye
 
 }
 
+unsigned short Date::WeekDay() const {
+
+	return (YearCode() + MonthCode() + CenturyCode() + m_day - LeapCode()) % 7;
+
+}
+
 unsigned short Date::Day() const {
 
 	return m_day;
@@ -105,7 +111,7 @@ unsigned short Date::DaysPerMonth(unsigned short month, unsigned short year) {
 	28/29 days: february
 	*/
 
-	bool leap = year % 4 == 0;
+	bool leap = IsLeap(year);
 
 	switch (month) {
 	case 1:
@@ -184,4 +190,89 @@ void Date::ValidateDate() {
 		AddTime(add, 0, 0);
 	}
 
+}
+
+bool Date::IsLeap(unsigned short year) const {
+
+	bool leap = false;
+
+	if (year > 1700)
+		leap = (year % 4 == 0) && ((year % 100 != 0) || (year % 400) == 0);
+	else
+		leap = year % 4 == 0;
+
+	return leap;
+
+}
+
+unsigned short Date::CenturyCode() const {
+
+	unsigned short codes[] = { 4,2,0,6 };
+	unsigned short cCode = 0;
+
+	if (m_year > 1700) {
+		unsigned short i = (unsigned short)((m_year - 1700) / 100) % 4;
+		cCode = codes[i];
+	}
+	else {
+		unsigned short cNumber = (unsigned short)m_year / 100;
+		cCode = (18 - cNumber) % 7;
+	}
+
+	return cCode;
+
+}
+
+unsigned short Date::YearCode() const {
+
+	unsigned short ltd = m_year % 100;	//year's last two digits
+	unsigned short yCode = (ltd + (unsigned short)(ltd / 4)) % 7;
+
+	return yCode;
+
+}
+
+unsigned short Date::MonthCode() const {
+
+	unsigned short code = 0;
+
+	switch (m_month) {
+	case 1:
+	case 10:
+		code = 0;
+		break;
+	case 2:
+	case 3:
+	case 11:
+		code = 3;
+		break;
+	case 4:
+	case 7:
+		code = 6;
+		break;
+	case 5:
+		code = 1;
+		break;
+	case 6:
+		break;
+		code = 4;
+	case 8:
+		code = 2;
+		break;
+	case 9:
+	case 12:
+		code = 5;
+		break;
+	}
+
+	return code;
+
+}
+
+unsigned short Date::LeapCode() const {
+
+	if (IsLeap(m_year) && (m_month <= 2))
+		return 1;
+	else
+		return 0;
 }

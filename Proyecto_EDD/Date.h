@@ -13,6 +13,7 @@ public:
 	bool SetDate(const SYSTEMTIME& systemTime);
 	void SetToday();
 	virtual void AddTime(unsigned short days, unsigned short months, unsigned short years);
+	unsigned short WeekDay() const;
 	unsigned short Day() const;
 	unsigned short Month() const;
 	unsigned short Year() const;
@@ -26,6 +27,13 @@ protected:
 	bool AddDays();
 	bool AddMonths();
 	virtual void ValidateDate();
+
+private:
+	bool IsLeap(unsigned short year) const;
+	unsigned short CenturyCode() const;
+	unsigned short YearCode() const;
+	unsigned short MonthCode() const;
+	unsigned short LeapCode() const;
 
 };
 

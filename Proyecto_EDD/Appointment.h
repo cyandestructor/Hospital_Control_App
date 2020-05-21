@@ -17,6 +17,7 @@ public:
 	const Patient& GetPatientInfo(List<Patient>& patientList) const;
 	void SetDoctor(unsigned long id);
 	unsigned long GetDoctorKey() const;
+	const Doctor& GetDoctorInfo(BinarySearchTree<Doctor>& drBST) const;
 	PhoneNumber& GetPhoneNumber();
 	void SetAppointmentDateTime(const DateTime& date);
 	const DateTime& GetDateTime() const;

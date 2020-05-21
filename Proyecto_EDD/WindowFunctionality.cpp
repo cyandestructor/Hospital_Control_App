@@ -439,6 +439,32 @@ ValidationError ValidateAppRegister(HWND hWnd) {
 
 }
 
+bool ValidDrSchAppTime(const Appointment& app, BinarySearchTree<Doctor>& drBST) {
+
+	DateTime appDT = app.GetDateTime(), endDT = app.GetDateTime();
+	Doctor drInfo = app.GetDoctorInfo(drBST);
+	Schedule drSch = drInfo.GetSchedule();
+	Schedule auxSch;
+	
+	if (app.IsDouble())
+		endDT.AddTime(0, 0, 0, 0, 40);
+	else
+		endDT.AddTime(0, 0, 0, 0, 20);
+
+	auxSch.Reserve(appDT, endDT);
+	auxSch.SetWorkDay(appDT.WeekDay(), true);
+
+	if (!drSch.ConflictWith(auxSch, SchValidate::SCH_ALL)) {
+		//THE DOCTOR SCHEDULE AND THE APP TIME DO NOT MATCH
+		MessageBoxW(NULL, L"Error", L"El doctor seleccionado no está disponible en esa fecha y hora",
+			MB_ICONERROR | MB_OK);
+		return false;
+	}
+
+	return true;
+
+}
+
 void ReserveApp(const Appointment& app, List<Appointment>& appList, List<MedOffice>& moList) {
 
 	//Get the info of the selected medical office

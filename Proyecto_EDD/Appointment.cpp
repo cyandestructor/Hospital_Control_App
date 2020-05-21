@@ -34,6 +34,16 @@ unsigned long Appointment::GetDoctorKey() const {
 
 }
 
+const Doctor& Appointment::GetDoctorInfo(BinarySearchTree<Doctor>& drBST) const {
+
+	Doctor tmp(this->m_doctorID);
+
+	drBST.BinarySearch(tmp, tmp);
+
+	return tmp;
+
+}
+
 PhoneNumber& Appointment::GetPhoneNumber() {
 
 	return m_phoneNumber;

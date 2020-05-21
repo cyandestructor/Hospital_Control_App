@@ -29,6 +29,7 @@ void SelectQueryType(HWND hWnd, int comboBoxID);
 void InitRegAppControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetAppRegisterInfo(HWND hWnd, Appointment& app);
 ValidationError ValidateAppRegister(HWND hWnd);
+bool ValidDrSchAppTime(const Appointment& app, BinarySearchTree<Doctor>& drBST);
 void ReserveApp(const Appointment& app, List<Appointment>& appList, List<MedOffice>& moList);
 void ClearAppRegister(HWND hWnd);
 void SelectPatient(HWND hWnd, int comboBoxID, List<Patient>& patList);
