@@ -2,7 +2,7 @@
 
 Appointment::Appointment() {
 
-	m_doctorID = m_key = m_medOfficeKey = m_patientKey = 0;
+	m_doctorID = m_key = m_medOfficeKey = m_speKey = m_patientKey = 0;
 	m_isDouble = false;
 
 }
@@ -36,7 +36,7 @@ unsigned long Appointment::GetDoctorKey() const {
 
 const Doctor& Appointment::GetDoctorInfo(BinarySearchTree<Doctor>& drBST) const {
 
-	Doctor tmp(this->m_doctorID);
+	static Doctor tmp(this->m_doctorID);
 
 	drBST.BinarySearch(tmp, tmp);
 
@@ -66,6 +66,15 @@ void Appointment::SetMedOffice(unsigned int key) {
 
 	m_medOfficeKey = key;
 
+}
+
+unsigned int Appointment::GetSpeciality(BinarySearchTree<Doctor>& drBST) const {
+
+	if (m_speKey == 0) {
+		m_speKey = this->GetDoctorInfo(drBST).GetSpeciality();
+	}
+
+	return m_speKey;
 }
 
 const MedOffice& Appointment::GetMedOffice(List<MedOffice>& medOffList) const {

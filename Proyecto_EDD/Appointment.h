@@ -23,6 +23,8 @@ public:
 	const DateTime& GetDateTime() const;
 	void SetMedOffice(unsigned int key);
 	const MedOffice& GetMedOffice(List<MedOffice>& medOffList) const;
+	unsigned int GetMedOfficeKey() const { return m_medOfficeKey; }
+	unsigned int GetSpeciality(BinarySearchTree<Doctor>& drBST) const;
 	void SetDescription(std::wstring& description);
 	const std::wstring& GetDescription() const;
 	void SetDouble(bool isDouble) { m_isDouble = isDouble; }
@@ -33,6 +35,7 @@ public:
 
 private:
 	mutable unsigned int m_key;
+	mutable unsigned int m_speKey;
 	unsigned int m_patientKey;
 	unsigned int m_medOfficeKey;
 	unsigned long m_doctorID;

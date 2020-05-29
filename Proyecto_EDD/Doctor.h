@@ -11,8 +11,8 @@ public:
 	Doctor() :m_professionalID(0), m_speKey(0), m_medOffNum(0) {}
 	Doctor(unsigned long proID) :m_professionalID(proID), m_speKey(0), m_medOffNum(0) {}
 	void SetProfessionalID(unsigned long professionalID);
-	std::wstring ProfessionalID();
-	unsigned long ULProfessionalID();
+	std::wstring ProfessionalID() const;
+	unsigned long ULProfessionalID() const;
 	void SetImagePath(std::wstring imagePath);
 	void SetImagePath(const wchar_t* imagePath);
 	const std::wstring& GetImagePath() const;

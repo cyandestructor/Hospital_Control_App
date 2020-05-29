@@ -23,6 +23,17 @@ struct ValidationError {
 
 void InitQueryAppControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void SelectQueryType(HWND hWnd, int comboBoxID);
+void QueryDoctorMonth(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer);
+void QuerySpeciality(HWND hWnd, List<Appointment>& appList, BinarySearchTree<Doctor>& drBST, List<Appointment>& buffer);
+void QueryWeek(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer);
+bool GetAppByDoctor(List<Appointment>& appList, unsigned long proID, List<Appointment>& buffer, bool chain);
+bool GetAppBySpe(List<Appointment>& appList, unsigned int speKey,
+	BinarySearchTree<Doctor>& drBST, List<Appointment>& buffer, bool chain);
+bool GetAppByMonth(List<Appointment>& appList, unsigned short month, List<Appointment>& buffer, bool chain);
+bool GetAppByWeek(List<Appointment>& appList, const DateTime& dateTimeRef, List<Appointment>& buffer, bool chain);
+void ShowQuery(HWND hWnd, List<Appointment>& appList);
+void SaveQueryFile(List<Appointment>& appList, wchar_t* fileName);	//TODO
+TimePeriod GetWeekFromDate(const DateTime& dateTimeRef);
 
 //Register Appointment Window
 
@@ -57,7 +68,7 @@ void GetPatientRegisterInfo(HWND hWnd, Patient& patient);
 ValidationError ValidatePatientRegister(HWND hWnd);
 void ClearPatientRegister(HWND hWnd);
 Patient& FindPatientWithKey(List<Patient>& patList, unsigned int key);
-void ViewSelectedPatient(HWND hWnd);
+void ViewSelectedPatient(HWND hWnd);	//TODO
 void DeleteSelectedPatient(HWND hWnd, List<Patient>& patList);	//TODO
 void SavePatientReport(HWND hWnd, List<Patient>& patList);
 void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& filepath);

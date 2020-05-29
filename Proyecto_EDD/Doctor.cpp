@@ -6,13 +6,13 @@ void Doctor::SetProfessionalID(unsigned long professionalID) {
 
 }
 
-std::wstring Doctor::ProfessionalID() {
+std::wstring Doctor::ProfessionalID() const {
 
 	return std::to_wstring(m_professionalID);
 
 }
 
-unsigned long Doctor::ULProfessionalID() {
+unsigned long Doctor::ULProfessionalID() const {
 
 	return m_professionalID;
 

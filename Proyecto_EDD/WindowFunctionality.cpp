@@ -326,6 +326,186 @@ void SelectQueryType(HWND hWnd, int comboBoxID) {
 
 }
 
+void QueryDoctorMonth(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer) {
+
+	//Get Dr profesional ID
+	std::wstring aux;
+	GetWindowTextWstring(hWnd, aux);
+	unsigned long proID = std::stoul(aux);
+
+	//Get Month
+	unsigned short month = (unsigned short)SendDlgItemMessageW(hWnd, IDC_QA_MONTH_COMBO, CB_GETCURSEL, NULL, NULL) + 1;
+
+	//QUERY
+	List<Appointment> tempBuffer;
+	GetAppByDoctor(appList, proID, tempBuffer, false);
+	GetAppByMonth(tempBuffer, month, buffer, false);	//	Filtering
+
+}
+
+void QuerySpeciality(HWND hWnd, List<Appointment>& appList, BinarySearchTree<Doctor>& drBST, List<Appointment>& buffer) {
+
+	unsigned int speKey = GetKeyFromCB(hWnd, IDC_QA_SPE_COMBO);
+
+	GetAppBySpe(appList, speKey, drBST, buffer, false);
+
+}
+
+void QueryWeek(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer) {
+
+	SYSTEMTIME st;
+	ZeroMemory(&st, sizeof(SYSTEMTIME));
+	SendDlgItemMessageW(hWnd, IDC_QA_WEEK_DTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&st);
+	DateTime queryDT(st);
+
+	GetAppByWeek(appList, queryDT, buffer, false);
+
+}
+
+bool GetAppByDoctor(List<Appointment>& appList, unsigned long proID, List<Appointment>& buffer, bool chain) {
+
+	bool found = false;
+	if (!chain)
+		buffer.Clear();		//Clear the buffer
+
+	appList.ForEach([&](Appointment& app) {
+		if (app.GetDoctorKey() == proID) {
+			buffer.Push(app);
+			found = true;
+		}
+		});
+
+	return found;
+
+}
+
+bool GetAppBySpe(List<Appointment>& appList, unsigned int speKey,
+	BinarySearchTree<Doctor>& drBST, List<Appointment>& buffer, bool chain) {
+
+	bool found = false;
+	if (!chain)
+		buffer.Clear();		//Clear the buffer
+
+	appList.ForEach([&](Appointment& app) {
+		if (app.GetSpeciality(drBST) == speKey) {
+			buffer.Push(app);
+			found = true;
+		}
+		});
+
+	return found;
+
+}
+
+bool GetAppByMonth(List<Appointment>& appList, unsigned short month, List<Appointment>& buffer, bool chain) {
+
+	bool found = false;
+	if (!chain)
+		buffer.Clear();		//Clear the buffer
+
+	if (month >= 0 && month <= 12) {
+
+		appList.ForEach([&](Appointment& app) {
+			DateTime appDT = app.GetDateTime();
+			if (appDT.Month() == month) {
+				buffer.Push(app);
+				found = true;
+			}
+			});
+
+	}
+
+	return found;
+
+}
+
+bool GetAppByWeek(List<Appointment>& appList, const DateTime& dateTimeRef, List<Appointment>& buffer, bool chain) {
+
+	bool found = false;
+	if (!chain)
+		buffer.Clear();		//Clear the buffer
+
+	TimePeriod week = GetWeekFromDate(dateTimeRef);
+
+	appList.ForEach([&](Appointment& app) {
+		DateTime appDT = app.GetDateTime();
+		if (appDT >= week.Begin() && appDT <= week.End()) {		//if the app dateTime is in between
+			buffer.Push(app);
+			found = true;
+		}
+		});
+
+	return found;
+}
+
+void ShowQuery(HWND hWnd, List<Appointment>& appList) {
+
+	//clear the list
+	SendDlgItemMessageW(hWnd, IDC_QA_APP_LIST, LB_RESETCONTENT, NULL, NULL);
+
+	appList.ForEach([&](Appointment& app) {
+		std::wstring aux = std::to_wstring(app.Key()) + L" CITA";
+		SendDlgItemMessageW(hWnd, IDC_QA_APP_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		});
+
+}
+
+void SaveQueryFile(List<Appointment>& appList, List<Patient>& patList, BinarySearchTree<Doctor> drBST, wchar_t* fileName) {
+
+	ofstream queryFile;
+
+	std::wstring appDirectory = DocumentsDirectory() + MAIN_FOLDER;
+	int res = _wmkdir(appDirectory.c_str());
+	appDirectory += L"\\Query";
+	res = _wmkdir(appDirectory.c_str());
+	std::wstring fullpath = appDirectory + L"\\" + fileName;
+
+	queryFile.open(fullpath, ios::out | ios::trunc);
+
+	if (queryFile.is_open()) {
+
+		appList.ForEach([&](Appointment& app) {
+
+			Doctor appDr = app.GetDoctorInfo(drBST);
+			Patient appPat = app.GetPatientInfo(patList);
+
+			queryFile << L"-----------------------------------------------" << std::endl;
+			queryFile << L"# " << app.Key() << std::endl;
+			queryFile << L"Fecha: " << app.GetDateTime() << std::endl;
+			queryFile << L"# Consultorio: " << app.GetMedOfficeKey() << std::endl;
+			queryFile << L"Cod. Especialidad: " << appDr.GetSpeciality() << std::endl;
+			queryFile << L"Fecha: " << app.GetDateTime() << std::endl;
+			queryFile << L"Médico: " << appDr.GetName(Names::FULL_NAME).c_str() << std::endl;
+			queryFile << L"Paciente: " << appPat.GetName(Names::FULL_NAME).c_str() << std::endl;
+			queryFile << L"Tel: " << appPat.GetPhoneNumber().PhoneNumberString(true).c_str() << std::endl;
+			queryFile << L"Atendida: " << "si" << std::endl;
+			queryFile << L"Cancelada: " << "no" << std::endl;
+			queryFile << L"-----------------------------------------------" << std::endl;
+
+			});
+
+		queryFile.close();
+		std::wstring msgBox = L"Se generó un archivo de texto con su consulta en: " + fullpath;
+		MessageBoxW(NULL, L"Guardado completo", msgBox.c_str(), MB_ICONEXCLAMATION | MB_OK);
+
+	}
+	else {
+		MessageBoxW(NULL, L"Error al abrir el archivo", L"El archivo no se pudo abrir", MB_ICONEXCLAMATION | MB_OK);
+	}
+
+}
+
+TimePeriod GetWeekFromDate(const DateTime& dateTimeRef) {
+
+	unsigned short weekDayRef = dateTimeRef.WeekDay();
+	unsigned short daysUp = 6 - weekDayRef;
+
+	DateTime lastDay = DateTime::DateTimeAdd(dateTimeRef, daysUp, 0, 0, 0, 0);
+
+	return TimePeriod(dateTimeRef, lastDay);
+
+}
+
 #pragma endregion Query_App_Window
 
 #pragma region Reg_App_Window
@@ -531,14 +711,6 @@ Patient& FindPatientWithKey(List<Patient>& patList, unsigned int key) {
 	return patList.Search<unsigned int>(key, [](const Patient& pat, const unsigned int& s_key) {
 		return pat.Key() == s_key;
 		});
-
-}
-
-void ViewSelectedPatient(HWND hWnd) {
-
-	unsigned int key = GetKeyFromLB(hWnd, IDC_PATIENT_LIST);
-
-	//TODO: Create view dialog
 
 }
 
@@ -800,8 +972,9 @@ bool ValidateDoctorPerMO(HWND hWnd, BinarySearchTree<Doctor>& drBST, Doctor& toV
 	if (conflict) {
 		MessageBoxW(hWnd, L"Error", L"Ya hay un doctor en el mismo horario y consultorio",
 			MB_ICONERROR | MB_OK);
-		return conflict;
 	}
+	
+	return conflict;
 
 }
 
@@ -1027,6 +1200,33 @@ void InitRegPatientControls(HWND hWnd, void(*initWithGlobals)(HWND)) {
 		}
 
 	}
+
+}
+
+void ViewSelectedPatient(HWND hWnd) {
+
+	unsigned int key = GetKeyFromLB(hWnd, IDC_PATIENT_LIST);
+
+	//TODO: Create view dialog
+
+}
+
+void DeleteSelectedPatient(HWND hWnd, List<Patient>& patList) {
+
+	unsigned int key = GetKeyFromLB(hWnd, IDC_SPE_LIST);
+	int deleted = -1, i = 0;
+
+	//TODO: VALIDATE APPOINTMENTS WITH THAT PATIENT
+
+	//Find the element with that key
+	patList.ForEach([&](Patient& pat) {
+		if (pat.Key() == key)
+			deleted = i;	//if found: save the current index
+		i++;
+		});
+
+	if (deleted > -1)
+		Patient tmp = patList.Delete((unsigned int)deleted);
 
 }
 
@@ -1265,6 +1465,14 @@ void ClearSpeRegister(HWND hWnd) {
 
 }
 
+void ViewSelectedSpeciality(HWND hWnd) {
+
+	unsigned int key = GetKeyFromLB(hWnd, IDC_SPE_LIST);
+
+	//TODO: Create view dialog
+
+}
+
 void DeleteSelectedSpeciality(HWND hWnd, List<Speciality>& speList, BinarySearchTree<Doctor>& drBST) {
 
 	unsigned int key = GetKeyFromLB(hWnd, IDC_SPE_LIST);
@@ -1280,7 +1488,7 @@ void DeleteSelectedSpeciality(HWND hWnd, List<Speciality>& speList, BinarySearch
 			});
 
 		if (deleted > -1)
-			speList.Delete((unsigned int)deleted);
+			Speciality tmp = speList.Delete((unsigned int)deleted);
 
 	}
 	else {

@@ -2,6 +2,8 @@
 #define _DATE_TIME_CLASS_
 
 #include <Windows.h>
+#include <iostream>
+#include <iomanip>
 #include "Date.h"
 #include "Time.h"
 
@@ -22,6 +24,7 @@ public:
 		unsigned short day, unsigned short month, unsigned short year,
 		unsigned short hour, unsigned short minute);
 
+	friend std::ostream& operator<<(std::ostream& os, const DateTime& dt);
 	friend bool operator==(const DateTime& firstDateTime, const DateTime& secondDateTime);
 	friend bool operator!=(const DateTime& firstDateTime, const DateTime& secondDateTime);
 	friend bool operator<(const DateTime& firstDateTime, const DateTime& secondDateTime);
@@ -30,5 +33,13 @@ public:
 	friend bool operator>=(const DateTime& firstDateTime, const DateTime& secondDateTime);
 
 };
+
+std::ostream& operator<<(std::ostream& os, const DateTime& dt) {
+
+	os << dt.m_day << "/" << dt.m_month << "/" << dt.m_year << " "
+		<< std::setfill('0') << std::setw(2) << dt.m_hour << std::setw(1) << ":" << std::setw(2) << dt.m_minute;
+
+	return os;
+}
 
 #endif
