@@ -26,13 +26,18 @@ void SelectQueryType(HWND hWnd, int comboBoxID);
 void QueryDoctorMonth(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer);
 void QuerySpeciality(HWND hWnd, List<Appointment>& appList, BinarySearchTree<Doctor>& drBST, List<Appointment>& buffer);
 void QueryWeek(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer);
+void QueryCode(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer);
+void QueryMedOffice(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer);
 bool GetAppByDoctor(List<Appointment>& appList, unsigned long proID, List<Appointment>& buffer, bool chain);
 bool GetAppBySpe(List<Appointment>& appList, unsigned int speKey,
 	BinarySearchTree<Doctor>& drBST, List<Appointment>& buffer, bool chain);
 bool GetAppByMonth(List<Appointment>& appList, unsigned short month, List<Appointment>& buffer, bool chain);
+bool GetAppByMedicalOffice(List<Appointment>& appList, unsigned int moKey, List<Appointment>& buffer, bool chain);
+bool GetAppByCode(List<Appointment>& appList, unsigned int appCode, List<Appointment>& buffer, bool chain);
 bool GetAppByWeek(List<Appointment>& appList, const DateTime& dateTimeRef, List<Appointment>& buffer, bool chain);
 void ShowQuery(HWND hWnd, List<Appointment>& appList);
-void SaveQueryFile(List<Appointment>& appList, wchar_t* fileName);	//TODO
+void SaveQueryFile(List<Appointment>& appList, List<Patient>& patList, BinarySearchTree<Doctor>& drBST, const wchar_t* fileName);
+void ClearQuery(HWND hWnd, List<Appointment>& qBuffer);
 TimePeriod GetWeekFromDate(const DateTime& dateTimeRef);
 
 //Register Appointment Window

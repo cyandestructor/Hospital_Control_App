@@ -362,6 +362,23 @@ void QueryWeek(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer)
 
 }
 
+void QueryCode(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer) {
+
+	std::wstring aux;
+	GetWindowTextWstring(hWnd, aux);
+	unsigned int appCode = (unsigned int)stoi(aux);
+	GetAppByCode(appList, appCode, buffer, false);
+
+}
+
+void QueryMedOffice(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer) {
+
+	unsigned int moKey = GetKeyFromCB(hWnd, IDC_QA_MO_COMBO);
+
+	GetAppByMedicalOffice(appList, moKey, buffer, false);
+
+}
+
 bool GetAppByDoctor(List<Appointment>& appList, unsigned long proID, List<Appointment>& buffer, bool chain) {
 
 	bool found = false;
@@ -438,6 +455,40 @@ bool GetAppByWeek(List<Appointment>& appList, const DateTime& dateTimeRef, List<
 	return found;
 }
 
+bool GetAppByCode(List<Appointment>& appList, unsigned int appCode, List<Appointment>& buffer, bool chain) {
+
+	bool found = false;
+	if (!chain)
+		buffer.Clear();		//Clear the buffer
+
+	appList.ForEach([&](Appointment& app) {
+		if (app.Key() == appCode) {
+			buffer.Push(app);
+			found = true;
+		}
+		});
+
+	return found;
+
+}
+
+bool GetAppByMedicalOffice(List<Appointment>& appList, unsigned int moKey, List<Appointment>& buffer, bool chain) {
+	
+	bool found = false;
+	if (!chain)
+		buffer.Clear();		//Clear the buffer
+
+	appList.ForEach([&](Appointment& app) {
+		if (app.GetMedOfficeKey() == moKey) {
+			buffer.Push(app);
+			found = true;
+		}
+		});
+
+	return found;
+
+}
+
 void ShowQuery(HWND hWnd, List<Appointment>& appList) {
 
 	//clear the list
@@ -450,7 +501,7 @@ void ShowQuery(HWND hWnd, List<Appointment>& appList) {
 
 }
 
-void SaveQueryFile(List<Appointment>& appList, List<Patient>& patList, BinarySearchTree<Doctor> drBST, wchar_t* fileName) {
+void SaveQueryFile(List<Appointment>& appList, List<Patient>& patList, BinarySearchTree<Doctor>& drBST, const wchar_t* fileName) {
 
 	ofstream queryFile;
 
@@ -492,6 +543,33 @@ void SaveQueryFile(List<Appointment>& appList, List<Patient>& patList, BinarySea
 	else {
 		MessageBoxW(NULL, L"Error al abrir el archivo", L"El archivo no se pudo abrir", MB_ICONEXCLAMATION | MB_OK);
 	}
+
+}
+
+void ClearQuery(HWND hWnd, List<Appointment>& qBuffer) {
+
+	//CLEAR THE LIST
+	SendDlgItemMessageW(hWnd, IDC_QA_APP_LIST, LB_RESETCONTENT, NULL, NULL);
+
+	//DISABLE CONTROLS
+	HWND controls[6];
+
+	controls[0] = GetDlgItem(hWnd, IDC_QA_APPCODE_EDIT);
+	controls[1] = GetDlgItem(hWnd, IDC_QA_PID_EDIT);
+	controls[2] = GetDlgItem(hWnd, IDC_QA_SEARCHDR_CMD);
+	controls[3] = GetDlgItem(hWnd, IDC_QA_MONTH_COMBO);
+	controls[4] = GetDlgItem(hWnd, IDC_QA_WEEK_DTP);
+	controls[5] = GetDlgItem(hWnd, IDC_QA_SPE_COMBO);
+
+	for (HWND control : controls) {
+		EnableWindow(control, FALSE);
+	}
+
+	//SET THE QUERY TYPE TO UNSPECIFIED
+	SendDlgItemMessageW(hWnd, IDC_QA_ATYPE_COMBO, CB_SETCURSEL, -1, NULL);
+
+	//CLEAR THE BUFFER
+	qBuffer.Clear();
 
 }
 

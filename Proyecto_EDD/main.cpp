@@ -207,6 +207,10 @@ BOOL CALLBACK RegAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 BOOL CALLBACK QueryAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
+	static List<Appointment> queryBuffer;	//Buffer for main query
+	List<Appointment> auxBuffer;			//Buffer for secondary query
+	int queryType = -1;
+
 	switch (msg) {
 
 	case WM_INITDIALOG:
@@ -218,8 +222,34 @@ BOOL CALLBACK QueryAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case IDC_QA_SEARCHDR_CMD:
 			break;
 		case IDC_QA_SEARCHAPP_CMD:
+
+			queryType = (int)SendDlgItemMessageW(hWnd, IDC_QA_ATYPE_COMBO, CB_GETCURSEL, NULL, NULL);
+			switch (queryType) {
+			case 0:
+				QueryCode(hWnd, g_appList, queryBuffer);
+				SaveQueryFile(queryBuffer, g_patientList, g_doctorBST, L"CodeQuery.txt");
+				break;
+			case 1:
+				QueryWeek(hWnd, g_appList, queryBuffer);
+				SaveQueryFile(queryBuffer, g_patientList, g_doctorBST, L"WeekQuery.txt");
+				break;
+			case 2:
+				QueryDoctorMonth(hWnd, g_appList, queryBuffer);
+				SaveQueryFile(queryBuffer, g_patientList, g_doctorBST, L"DoctorQuery.txt");
+				break;
+			case 3:
+				QuerySpeciality(hWnd, g_appList, g_doctorBST, queryBuffer);
+				SaveQueryFile(queryBuffer, g_patientList, g_doctorBST, L"SpeQuery.txt");
+				break;
+			default:
+				queryBuffer.Clear();
+			}
+			ShowQuery(hWnd, queryBuffer);
+			EnableWindow(GetDlgItem(hWnd, IDC_QA_MO_COMBO), TRUE);	//Enable the Medical office query
 			break;
 		case IDC_QA_CLEARAPP_CMD:
+			ClearQuery(hWnd, queryBuffer);
+			EnableWindow(GetDlgItem(hWnd, IDC_QA_MO_COMBO), FALSE);	//Disable the Medical office query
 			break;
 		case IDC_QA_LOOKAPP_CMD:
 			break;
@@ -232,7 +262,17 @@ BOOL CALLBACK QueryAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		switch (HIWORD(wParam)) {
 		case CBN_SELCHANGE:
-			SelectQueryType(hWnd, LOWORD(wParam));
+
+			switch (LOWORD(wParam)) {
+			case IDC_QA_ATYPE_COMBO:
+				SelectQueryType(hWnd, LOWORD(wParam));
+				break;
+			case IDC_QA_MO_COMBO:
+				QueryMedOffice(hWnd, queryBuffer, auxBuffer);
+				ShowQuery(hWnd, auxBuffer);
+				break;
+			}
+
 			break;
 		}
 

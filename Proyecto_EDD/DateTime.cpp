@@ -100,3 +100,11 @@ bool operator>=(const DateTime& firstDateTime, const DateTime& secondDateTime) {
 	return (firstDateTime > secondDateTime) || (firstDateTime == secondDateTime);
 
 }
+
+std::ostream& operator<<(std::ostream& os, const DateTime& dt) {
+
+	os << dt.m_day << "/" << dt.m_month << "/" << dt.m_year << " "
+		<< std::setfill('0') << std::setw(2) << dt.m_hour << std::setw(1) << ":" << std::setw(2) << dt.m_minute;
+
+	return os;
+}
