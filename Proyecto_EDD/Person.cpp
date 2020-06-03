@@ -2,7 +2,6 @@
 
 Person::Person() {
 
-	m_age = 0;
 	m_gender = Gender::OTHER;
 	m_phoneNumber = L"0000000000";
 
@@ -77,15 +76,9 @@ const Date& Person::Birthdate() const {
 
 }
 
-void Person::SetAge(unsigned short age) {
-
-	m_age = age;
-
-}
-
 unsigned short Person::Age() const {
 
-	return m_age;
+	//TODO CALCULATE AGE
 
 }
 

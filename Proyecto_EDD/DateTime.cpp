@@ -32,6 +32,12 @@ int DateTime::CompareWith(const DateTime& other) const {
 
 }
 
+std::wstring DateTime::DateTimeWstring() const {
+	
+	return std::to_wstring(m_day) + L"/" + std::to_wstring(m_month) + L"/" + std::to_wstring(m_year);
+
+}
+
 const DateTime DateTime::RightNow() {
 
 	SYSTEMTIME aux;

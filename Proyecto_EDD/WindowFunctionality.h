@@ -23,6 +23,9 @@ struct ValidationError {
 
 void InitQueryAppControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void SelectQueryType(HWND hWnd, int comboBoxID);
+void QASearchDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST);
+void MarkApp(HWND hWnd, List<Appointment>& appList, List<MedOffice>& moList);
+void CancelApp(HWND hWnd, List<Appointment>& appList, List<MedOffice>& moList);
 void QueryDoctorMonth(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer);
 void QuerySpeciality(HWND hWnd, List<Appointment>& appList, BinarySearchTree<Doctor>& drBST, List<Appointment>& buffer);
 void QueryWeek(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer);
@@ -46,7 +49,7 @@ void InitRegAppControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetAppRegisterInfo(HWND hWnd, Appointment& app);
 ValidationError ValidateAppRegister(HWND hWnd);
 bool ValidDrSchAppTime(const Appointment& app, BinarySearchTree<Doctor>& drBST);
-void ReserveApp(const Appointment& app, List<Appointment>& appList, List<MedOffice>& moList);
+void ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& moList);
 void ClearAppRegister(HWND hWnd);
 void SelectPatient(HWND hWnd, int comboBoxID, List<Patient>& patList);
 void SelectDoctor(HWND hWnd, int comboBoxID, BinarySearchTree<Doctor>& drList);

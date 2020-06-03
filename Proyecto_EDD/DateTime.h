@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 #include <iostream>
+#include <string>
 #include <iomanip>
 #include "Date.h"
 #include "Time.h"
@@ -18,6 +19,7 @@ public:
 	void AddTime(unsigned short day, unsigned short month, unsigned short year,
 		unsigned short hour, unsigned short minute);
 	int CompareWith(const DateTime& other) const;
+	std::wstring DateTimeWstring() const;
 
 	static const DateTime RightNow();
 	static const DateTime DateTimeAdd(const DateTime& orig, 

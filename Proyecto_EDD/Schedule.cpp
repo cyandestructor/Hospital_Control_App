@@ -39,6 +39,26 @@ void Schedule::Reserve(const DateTime& from, const DateTime& to) {
 
 }
 
+void Schedule::SetFree(const DateTime& from, const DateTime& to) {
+
+	for (unsigned int i = 0; i < m_reservedTime.size(); i++) {
+		if (m_reservedTime[i].Begin() == from && m_reservedTime[i].End() == to) {
+			m_reservedTime.erase(m_reservedTime.begin() + i);	//Erase the found element
+			break;
+		}
+	}
+
+}
+
+void Schedule::Free() {
+
+	for (bool day : m_workDays)
+		day = false;
+
+	m_reservedTime.clear();
+
+}
+
 bool Schedule::ConflictWith(const Schedule& other, SchValidate validate) const {
 
 	bool timeConfict = false, workDayConflict = false;

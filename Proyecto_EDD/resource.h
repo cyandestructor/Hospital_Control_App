@@ -10,8 +10,9 @@
 #define IDD_REG_MED                     106
 #define IDD_REG_SPE                     107
 #define IDD_REG_PATIENT                 108
-#define IDD_REG_APP1                    109
 #define IDD_VIEW_APP                    109
+#define IDD_VIEW_MED                    110
+#define IDD_VIEW_PATIENT                111
 #define IDC_COMBO1                      1002
 #define IDC_RP_GENDER_COMBO             1002
 #define IDC_COMBO2                      1003
@@ -20,6 +21,7 @@
 #define IDC_RP_FIRSTDR_COMBO            1004
 #define IDC_EDIT1                       1005
 #define IDC_RS_SPENAME_EDIT             1005
+#define IDC_DATETIME_EDIT               1005
 #define IDC_DATETIMEPICKER1             1006
 #define IDC_EDIT15                      1006
 #define IDC_RA_APPDATE_DTP              1006
@@ -30,6 +32,7 @@
 #define IDC_QA_PID_EDIT                 1007
 #define IDC_RA_APPTIME_DTP              1007
 #define IDC_RP_FLNAME_EDIT              1007
+#define IDC_MEDOFFNUM_EDIT              1007
 #define IDC_CHECK1                      1008
 #define IDC_EDIT13                      1008
 #define IDC_EDIT17                      1008
@@ -44,10 +47,12 @@
 #define IDC_COMBO5                      1010
 #define IDC_QA_MONTH_COMBO              1010
 #define IDC_RP_PHONENUM_EDIT            1010
+#define IDC_RA_DOUBLEAPP_CHECK2         1010
 #define IDC_EDIT3                       1011
 #define IDC_COMBO6                      1011
 #define IDC_QA_SPE_COMBO                1011
 #define IDC_RP_H_EDIT                   1011
+#define IDC_RA_DOUBLEAPP_CHECK3         1011
 #define IDC_EDIT4                       1012
 #define IDC_DATETIMEPICKER3             1012
 #define IDC_RM_SCHE_FROM_DTP            1012
@@ -72,6 +77,7 @@
 #define IDC_RS_REGSPE_CMD               1020
 #define IDC_BUTTON2                     1021
 #define IDC_RS_CLEARREG_CMD             1021
+#define IDC_RETURN_CMD                  1021
 #define IDC_BUTTON3                     1022
 #define IDC_RS_LOOKSPE_CMD              1022
 #define IDC_LIST1                       1023
@@ -96,6 +102,7 @@
 #define IDC_MAIN_TODAY                  1032
 #define IDC_RM_CLEARREG_CMD             1032
 #define IDC_MAIN_TIME                   1033
+#define IDC_EDIT_DR_CMD                 1033
 #define IDC_MAIN_USER_FULLNAME          1034
 #define IDC_MAIN_USERNAME               1035
 #define IDC_QA_ATYPE_COMBO              1036
@@ -118,6 +125,7 @@
 #define IDC_DR_NAME_EDIT                1053
 #define IDC_DR_PROID_EDIT               1054
 #define IDC_RA_ERROR_LOG                1055
+#define IDC_DR_SPE_EDIT                 1055
 #define IDC_DR_IMG                      1056
 #define IDC_RA_RESERVEAPP_CMD           1057
 #define IDC_RA_CLEARAPP_CMD             1058
@@ -144,6 +152,14 @@
 #define IDC_RP_ERROR_LOG                1079
 #define IDC_RM_ERROR_LOG                1080
 #define IDC_RS_ERROR_LOG                1081
+#define IDC_DESC_EDIT                   1082
+#define IDC_PHONENUM_EDIT               1083
+#define IDC_SAVE_EDIT_DR_CMD            1084
+#define IDC_CANCEL_EDIT_DR_CMD          1085
+#define IDC_EDIT_PATIENT_CMD            1086
+#define IDC_CANCEL_EDIT_PAT_CMD         1087
+#define IDC_SAVE_EDIT_PAT_CMD           1088
+#define IDC_EDIT_PATIENT_CMD2           1089
 #define CMD_REG_MED                     40004
 #define CMD_REG_PATIENT                 40005
 #define CMD_REG_DOC                     40006
@@ -158,7 +174,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        111
 #define _APS_NEXT_COMMAND_VALUE         40011
-#define _APS_NEXT_CONTROL_VALUE         1082
+#define _APS_NEXT_CONTROL_VALUE         1088
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

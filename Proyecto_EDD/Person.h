@@ -31,7 +31,6 @@ public:
 	std::wstring GetName(const Names name) const;
 	void SetBirthdate(const Date& date);
 	const Date& Birthdate() const;
-	void SetAge(unsigned short age);
 	unsigned short Age() const;
 	void SetGender(Gender gender);
 	Gender GetGender() const;
@@ -47,7 +46,6 @@ private:
 	std::wstring m_secondLastname;
 
 	Date m_birthdate;
-	unsigned short m_age;
 	Gender m_gender;
 	PhoneNumber m_phoneNumber;
 

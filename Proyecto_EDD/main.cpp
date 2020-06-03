@@ -438,8 +438,16 @@ BOOL CALLBACK RegSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 void IWGQueryApp(HWND hWnd) {
 
-
+	g_speList.ForEach([&](Speciality& spe) {
+		std::wstring aux = std::to_wstring(spe.Key()) + L" " + spe.Name();
+		SendDlgItemMessageW(hWnd, IDC_QA_SPE_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		});
 	
+	g_medOffList.ForEach([&](MedOffice& medoff) {
+		std::wstring aux = std::to_wstring(medoff.Number()) + L" Consultorio";
+		SendDlgItemMessageW(hWnd, IDC_QA_MO_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		});
+
 }
 
 void IWGRegApp(HWND hWnd) {
@@ -479,16 +487,44 @@ void IWGRegPatient(HWND hWnd) {
 		SendDlgItemMessageW(hWnd, IDC_RP_FIRSTDR_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
 		});
 
+	g_patientList.ForEach([&](Patient& pat) {
+		std::wstring aux = std::to_wstring(pat.Key()) + L" "
+			+ pat.GetName(Names::FIRST_NAME) + L" "
+			+ pat.GetName(Names::FIRST_LASTNAME);
+		SendDlgItemMessageW(hWnd, IDC_PATIENT_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		});
+
 }
 
 void IWGRegDoctor(HWND hWnd) {
 
+	g_medOffList.ForEach([&](MedOffice& medoff) {
+		std::wstring aux = std::to_wstring(medoff.Number()) + L" Consultorio";
+		SendDlgItemMessageW(hWnd, IDC_RM_MO_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		});
 	
+	g_doctorBST.ExecutePostorder([&](Doctor& doc) {
+		std::wstring aux = doc.ProfessionalID() + L" "
+			+ doc.GetName(Names::FIRST_NAME) + L" "
+			+ doc.GetName(Names::FIRST_LASTNAME);
+		SendDlgItemMessageW(hWnd, IDC_DR_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		});
+
 }
 
 void IWGRegSpe(HWND hWnd) {
 
+	g_speList.ForEach([&](Speciality& spe) {
+		std::wstring aux = std::to_wstring(spe.Key()) + L" " + spe.Name();
+		SendDlgItemMessageW(hWnd, IDC_SPE_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		});
 
+	g_doctorBST.ExecutePostorder([&](Doctor& doc) {
+		std::wstring aux = doc.ProfessionalID() + L" "
+			+ doc.GetName(Names::FIRST_NAME) + L" "
+			+ doc.GetName(Names::FIRST_LASTNAME);
+		SendDlgItemMessageW(hWnd, IDC_DR_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		});
 
 }
 

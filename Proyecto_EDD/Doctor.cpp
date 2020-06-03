@@ -73,6 +73,7 @@ void Doctor::Write(std::ostream& os) {
 	WriteWstring(m_imagePath, os);
 	m_schedule.Write(os);
 	os.write(reinterpret_cast<char*>(&m_speKey), sizeof(unsigned int));
+	os.write(reinterpret_cast<char*>(&m_medOffNum), sizeof(unsigned int));
 
 }
 
@@ -83,6 +84,7 @@ void Doctor::Read(std::istream& is) {
 	m_imagePath = ReadWstring(is);
 	m_schedule.Read(is);
 	is.read(reinterpret_cast<char*>(&m_speKey), sizeof(unsigned int));
+	is.read(reinterpret_cast<char*>(&m_medOffNum), sizeof(unsigned int));
 
 }
 

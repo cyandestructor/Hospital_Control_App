@@ -324,6 +324,76 @@ void SelectQueryType(HWND hWnd, int comboBoxID) {
 		break;
 	}
 
+	//Enable make query button
+	EnableWindow(GetDlgItem(hWnd, IDC_QA_SEARCHAPP_CMD), TRUE);
+
+}
+
+void QASearchDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
+	
+	std::wstring aux;
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_QA_PID_EDIT), aux);
+	unsigned long proID = stoul(aux);
+	Doctor temp(proID);
+	if (drBST.BinarySearch(temp, temp)) {
+		SetDlgItemTextW(hWnd, IDC_QA_DRNAME_EDIT, temp.GetName(Names::FULL_NAME).c_str());	//Show Doctor name
+		SetDlgItemTextW(hWnd, IDC_QA_DRSPE_EDIT, std::to_wstring(temp.GetSpeciality()).c_str());	//Show Doctor spe code
+	}
+	else {
+		SetDlgItemTextW(hWnd, IDC_QA_DRNAME_EDIT, L"NOT ENCONTRADO");
+		SetDlgItemTextW(hWnd, IDC_QA_DRSPE_EDIT, L"0000");
+	}
+	
+}
+
+void MarkApp(HWND hWnd, List<Appointment>& appList, List<MedOffice>& moList) {
+
+	unsigned int appKey = GetKeyFromLB(hWnd, IDC_QA_APP_LIST);
+
+	Appointment& retVal = appList.Search<unsigned int>(appKey, [](const Appointment& app, const unsigned int& key) {
+		return app.Key() == key;
+		});
+
+	retVal.MarkAttended(true);
+
+	//Free the time
+	unsigned int moKey = retVal.GetMedOfficeKey();
+	DateTime appBegin = retVal.GetDateTime();
+	DateTime appEnd;
+
+	if (retVal.IsDouble())
+		appEnd = DateTime::DateTimeAdd(appBegin, 0, 0, 0, 0, 40);
+	else
+		appEnd = DateTime::DateTimeAdd(appBegin, 0, 0, 0, 0, 20);
+
+	MedOffice& appMO = retVal.GetMedOffice(moList);
+	appMO.GetSchedule().SetFree(appEnd, appEnd);
+
+}
+
+void CancelApp(HWND hWnd, List<Appointment>& appList, List<MedOffice>& moList) {
+
+	unsigned int appKey = GetKeyFromLB(hWnd, IDC_QA_APP_LIST);
+
+	Appointment& retVal = appList.Search<unsigned int>(appKey, [](const Appointment& app, const unsigned int& key) {
+		return app.Key() == key;
+		});
+
+	retVal.Cancel(true);
+
+	//Free the time
+	unsigned int moKey = retVal.GetMedOfficeKey();
+	DateTime appBegin = retVal.GetDateTime();
+	DateTime appEnd;
+
+	if (retVal.IsDouble())
+		appEnd = DateTime::DateTimeAdd(appBegin, 0, 0, 0, 0, 40);
+	else
+		appEnd = DateTime::DateTimeAdd(appBegin, 0, 0, 0, 0, 20);
+
+	MedOffice& appMO = retVal.GetMedOffice(moList);
+	appMO.GetSchedule().SetFree(appEnd, appEnd);
+
 }
 
 void QueryDoctorMonth(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer) {
@@ -345,9 +415,19 @@ void QueryDoctorMonth(HWND hWnd, List<Appointment>& appList, List<Appointment>& 
 
 void QuerySpeciality(HWND hWnd, List<Appointment>& appList, BinarySearchTree<Doctor>& drBST, List<Appointment>& buffer) {
 
+	//Get speciality key
 	unsigned int speKey = GetKeyFromCB(hWnd, IDC_QA_SPE_COMBO);
 
-	GetAppBySpe(appList, speKey, drBST, buffer, false);
+	//Get the dateTime from dtp
+	SYSTEMTIME st;
+	ZeroMemory(&st, sizeof(SYSTEMTIME));
+	SendDlgItemMessageW(hWnd, IDC_QA_WEEK_DTP2, DTM_GETSYSTEMTIME, NULL, (LPARAM)&st);
+	DateTime queryDT(st);
+
+	//QUERY
+	List<Appointment> tempBuffer;
+	GetAppBySpe(appList, speKey, drBST, tempBuffer, false);	//Filtering
+	GetAppByWeek(tempBuffer, queryDT, buffer, false);
 
 }
 
@@ -472,6 +552,21 @@ bool GetAppByCode(List<Appointment>& appList, unsigned int appCode, List<Appoint
 
 }
 
+bool GetAppByCode(List<Appointment>& appList, unsigned int appCode, Appointment& retVal) {
+
+	bool found = false;
+
+	retVal = appList.Search<unsigned int>(appCode, [](const Appointment& app, const unsigned int& key) {
+		return app.Key() == key;
+		});
+
+	if (retVal.Key() != 0)
+		found = true;
+
+	return found;
+
+}
+
 bool GetAppByMedicalOffice(List<Appointment>& appList, unsigned int moKey, List<Appointment>& buffer, bool chain) {
 	
 	bool found = false;
@@ -495,7 +590,8 @@ void ShowQuery(HWND hWnd, List<Appointment>& appList) {
 	SendDlgItemMessageW(hWnd, IDC_QA_APP_LIST, LB_RESETCONTENT, NULL, NULL);
 
 	appList.ForEach([&](Appointment& app) {
-		std::wstring aux = std::to_wstring(app.Key()) + L" CITA";
+		DateTime appDT = app.GetDateTime();
+		std::wstring aux = std::to_wstring(app.Key()) + L" CITA" + appDT.DateTimeWstring();
 		SendDlgItemMessageW(hWnd, IDC_QA_APP_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
 		});
 
@@ -551,6 +647,16 @@ void ClearQuery(HWND hWnd, List<Appointment>& qBuffer) {
 	//CLEAR THE LIST
 	SendDlgItemMessageW(hWnd, IDC_QA_APP_LIST, LB_RESETCONTENT, NULL, NULL);
 
+	//SET THE COMBO BOXES SELECTION TO UNSPECIFIED
+	SendDlgItemMessageW(hWnd, IDC_QA_ATYPE_COMBO, CB_SETCURSEL, -1, NULL);
+	SendDlgItemMessageW(hWnd, IDC_QA_SPE_COMBO, CB_SETCURSEL, -1, NULL);
+	SendDlgItemMessageW(hWnd, IDC_QA_MONTH_COMBO, CB_SETCURSEL, -1, NULL);
+	SendDlgItemMessageW(hWnd, IDC_QA_MO_COMBO, CB_SETCURSEL, -1, NULL);
+
+	//CLEAR SOME EDIT CONTROLS
+	SetDlgItemTextW(hWnd, IDC_QA_DRNAME_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_QA_DRSPE_EDIT, L"");
+
 	//DISABLE CONTROLS
 	HWND controls[6];
 
@@ -565,8 +671,8 @@ void ClearQuery(HWND hWnd, List<Appointment>& qBuffer) {
 		EnableWindow(control, FALSE);
 	}
 
-	//SET THE QUERY TYPE TO UNSPECIFIED
-	SendDlgItemMessageW(hWnd, IDC_QA_ATYPE_COMBO, CB_SETCURSEL, -1, NULL);
+	//DISABLE MAKE QUERY BUTTON
+	EnableWindow(GetDlgItem(hWnd, IDC_QA_SEARCHAPP_CMD), FALSE);
 
 	//CLEAR THE BUFFER
 	qBuffer.Clear();
@@ -723,7 +829,7 @@ bool ValidDrSchAppTime(const Appointment& app, BinarySearchTree<Doctor>& drBST) 
 
 }
 
-void ReserveApp(const Appointment& app, List<Appointment>& appList, List<MedOffice>& moList) {
+void ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& moList) {
 
 	//Get the info of the selected medical office
 	MedOffice selMO = app.GetMedOffice(moList);

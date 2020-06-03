@@ -20,6 +20,8 @@ public:
 	bool IsReserved(const DateTime& from, const DateTime& to) const;
 	bool IsAvailable(const DateTime& from, const DateTime& to) const;
 	void Reserve(const DateTime& from, const DateTime& to);
+	void SetFree(const DateTime& from, const DateTime& to);
+	void Free();
 	void Write(ostream& os);
 	void Read(istream& is);
 
