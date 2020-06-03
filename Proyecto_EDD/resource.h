@@ -143,6 +143,8 @@
 #define IDC_RM_LOOKDR_CMD               1070
 #define IDC_RM_DELETEREG_CMD            1071
 #define IDC_RP_SNAME_EDIT               1072
+#define IDC_RM_GENDER_COMBO2            1072
+#define IDC_RM_SPE_COMBO                1072
 #define IDC_PATIENT_LIST                1073
 #define IDC_RP_REGPATIENT_CMD           1074
 #define IDC_RP_LOOKPATIENT_CMD          1075
@@ -159,7 +161,6 @@
 #define IDC_EDIT_PATIENT_CMD            1086
 #define IDC_CANCEL_EDIT_PAT_CMD         1087
 #define IDC_SAVE_EDIT_PAT_CMD           1088
-#define IDC_EDIT_PATIENT_CMD2           1089
 #define CMD_REG_MED                     40004
 #define CMD_REG_PATIENT                 40005
 #define CMD_REG_DOC                     40006

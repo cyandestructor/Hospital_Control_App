@@ -8,7 +8,6 @@
 #define DATA_FOLDER L"\\Data"
 #define ID_FLOAT_EDIT_CONTROL	66000
 #define ID_ALPHA_EDIT_CONTROL	66001
-#define WM_ADD_APP				(WM_USER + 1)
 
 enum class ErrorCode {
 	EC_EMPTY, EC_NO_SEL, EC_INVALID_SIZE, EC_INVALID_DATE, EC_INVALID_FORMAT, EC_NO_ERROR
@@ -90,6 +89,7 @@ void ClearSpeRegister(HWND hWnd);
 void ViewSelectedSpeciality(HWND hWnd);	//TODO
 void DeleteSelectedSpeciality(HWND hWnd, List<Speciality>& speList, BinarySearchTree<Doctor>& drBST);
 unsigned int DoctorsPerSpeciality(unsigned int key, BinarySearchTree<Doctor>& drBST, std::vector<Doctor>* buffer = 0);
+void ShowSpecialityDoctors(HWND hWnd, BinarySearchTree<Doctor>& drBST);
 
 //File Management
 
@@ -120,6 +120,11 @@ unsigned int GetKeyFromLB(HWND hWnd, int lbID = 0);
 unsigned long GetIDFromCB(HWND hWnd, int cbID = 0);
 unsigned long GetIDFromLB(HWND hWnd, int lbID = 0);
 std::wstring DocumentsDirectory();
+void UpdateDoctorList(HWND hWnd, BinarySearchTree<Doctor>& drBST, int controlID, bool cb = false);
+void UpdatePatientList(HWND hWnd, List<Patient>& patList, int controlID, bool cb = false);
+void UpdateSpecialityList(HWND hWnd, List<Speciality>& speList, int controlID, bool cb = false);
+void UpdateAppointmentList(HWND hWnd, List<Appointment>& appList, int controlID, bool cb = false);
+void UpdateMedicalOfficeList(HWND hWnd, List<MedOffice>& moList, int controlID, bool cb = false);
 
 //Control Subclasses
 

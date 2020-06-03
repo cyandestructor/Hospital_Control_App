@@ -306,6 +306,7 @@ BOOL CALLBACK RegPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 				GetPatientRegisterInfo(hWnd, patient);
 				g_patientList.Push(patient);
 				ClearPatientRegister(hWnd);
+				UpdatePatientList(hWnd, g_patientList, IDC_PATIENT_LIST);
 			}
 			else {
 				InterpretValidationError(validationError, true, hWnd, IDC_RP_ERROR_LOG);
@@ -353,6 +354,7 @@ BOOL CALLBACK RegMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				GetDoctorRegisterInfo(hWnd, doctor);	//Get Info from controls
 				g_doctorBST.Insert(doctor);				//Insert in the doctor tree
 				ClearDoctorRegister(hWnd);				//Clear controls
+				UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
 			}
 			else {
 				InterpretValidationError(validationError, true, hWnd, IDC_RM_ERROR_LOG);
@@ -403,6 +405,7 @@ BOOL CALLBACK RegSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				GetSpeRegisterInfo(hWnd, speciality);	//Get Info
 				g_speList.Push(speciality);
 				ClearSpeRegister(hWnd);
+				UpdateSpecialityList(hWnd, g_speList, IDC_SPE_LIST);
 			}
 			else {
 				InterpretValidationError(validationError, true, hWnd, IDC_RS_ERROR_LOG);
@@ -416,6 +419,7 @@ BOOL CALLBACK RegSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		case IDC_RS_DELETESPE_CMD:
 			break;
 		case IDC_RS_LOOKDRLIST_CMD:
+			ShowSpecialityDoctors(hWnd, g_doctorBST);
 			break;
 		case IDC_RS_LOOKDRINFO_CMD:
 			break;
@@ -438,93 +442,36 @@ BOOL CALLBACK RegSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 void IWGQueryApp(HWND hWnd) {
 
-	g_speList.ForEach([&](Speciality& spe) {
-		std::wstring aux = std::to_wstring(spe.Key()) + L" " + spe.Name();
-		SendDlgItemMessageW(hWnd, IDC_QA_SPE_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
-	
-	g_medOffList.ForEach([&](MedOffice& medoff) {
-		std::wstring aux = std::to_wstring(medoff.Number()) + L" Consultorio";
-		SendDlgItemMessageW(hWnd, IDC_QA_MO_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
-
+	UpdateSpecialityList(hWnd, g_speList, IDC_QA_SPE_COMBO, true);
+	UpdateMedicalOfficeList(hWnd, g_medOffList, IDC_QA_MO_COMBO, true);
 }
 
 void IWGRegApp(HWND hWnd) {
 
-	g_patientList.ForEach([&](Patient& pat) {
-		std::wstring aux = std::to_wstring(pat.Key()) + L" "
-			+ pat.GetName(Names::FIRST_NAME) + L" "
-			+ pat.GetName(Names::FIRST_LASTNAME);
-		SendDlgItemMessageW(hWnd, IDC_RA_SELPATIENT_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
-
-	g_speList.ForEach([&](Speciality& spe) {
-		std::wstring aux = std::to_wstring(spe.Key()) + L" " + spe.Name();
-		SendDlgItemMessageW(hWnd, IDC_RA_SELSPE_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
-
-	g_medOffList.ForEach([&](MedOffice& medoff) {
-		std::wstring aux = std::to_wstring(medoff.Number()) + L" Consultorio";
-		SendDlgItemMessageW(hWnd, IDC_RA_SELMO_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
-
-	g_doctorBST.ExecutePostorder([&](Doctor& doc) {
-		std::wstring aux = doc.ProfessionalID() + L" " 
-			+ doc.GetName(Names::FIRST_NAME) + L" " 
-			+ doc.GetName(Names::FIRST_LASTNAME);
-		SendDlgItemMessageW(hWnd, IDC_RA_SELDR_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
+	UpdatePatientList(hWnd, g_patientList, IDC_RA_SELPATIENT_COMBO, true);
+	UpdateSpecialityList(hWnd, g_speList, IDC_RA_SELSPE_COMBO, true);
+	UpdateMedicalOfficeList(hWnd, g_medOffList, IDC_RA_SELMO_COMBO, true);
+	UpdateDoctorList(hWnd, g_doctorBST, IDC_RA_SELDR_COMBO, true);
 
 }
 
 void IWGRegPatient(HWND hWnd) {
 
-	g_doctorBST.ExecutePostorder([&](Doctor& doc) {
-		std::wstring aux = doc.ProfessionalID() + L" "
-			+ doc.GetName(Names::FIRST_NAME) + L" "
-			+ doc.GetName(Names::FIRST_LASTNAME);
-		SendDlgItemMessageW(hWnd, IDC_RP_FIRSTDR_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
-
-	g_patientList.ForEach([&](Patient& pat) {
-		std::wstring aux = std::to_wstring(pat.Key()) + L" "
-			+ pat.GetName(Names::FIRST_NAME) + L" "
-			+ pat.GetName(Names::FIRST_LASTNAME);
-		SendDlgItemMessageW(hWnd, IDC_PATIENT_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
-
+	UpdateDoctorList(hWnd, g_doctorBST, IDC_RP_FIRSTDR_COMBO, true);
+	UpdatePatientList(hWnd, g_patientList, IDC_PATIENT_LIST);
 }
 
 void IWGRegDoctor(HWND hWnd) {
 
-	g_medOffList.ForEach([&](MedOffice& medoff) {
-		std::wstring aux = std::to_wstring(medoff.Number()) + L" Consultorio";
-		SendDlgItemMessageW(hWnd, IDC_RM_MO_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
-	
-	g_doctorBST.ExecutePostorder([&](Doctor& doc) {
-		std::wstring aux = doc.ProfessionalID() + L" "
-			+ doc.GetName(Names::FIRST_NAME) + L" "
-			+ doc.GetName(Names::FIRST_LASTNAME);
-		SendDlgItemMessageW(hWnd, IDC_DR_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
+	UpdateMedicalOfficeList(hWnd, g_medOffList, IDC_RM_MO_COMBO);
+	UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
 
 }
 
 void IWGRegSpe(HWND hWnd) {
 
-	g_speList.ForEach([&](Speciality& spe) {
-		std::wstring aux = std::to_wstring(spe.Key()) + L" " + spe.Name();
-		SendDlgItemMessageW(hWnd, IDC_SPE_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
-
-	g_doctorBST.ExecutePostorder([&](Doctor& doc) {
-		std::wstring aux = doc.ProfessionalID() + L" "
-			+ doc.GetName(Names::FIRST_NAME) + L" "
-			+ doc.GetName(Names::FIRST_LASTNAME);
-		SendDlgItemMessageW(hWnd, IDC_DR_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});
+	UpdateSpecialityList(hWnd, g_speList, IDC_SPE_LIST);
+	//UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
 
 }
 

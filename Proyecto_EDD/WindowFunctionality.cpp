@@ -259,6 +259,101 @@ std::wstring DocumentsDirectory() {
 
 }
 
+void UpdateDoctorList(HWND hWnd, BinarySearchTree<Doctor>& drBST, int controlID, bool cb) {
+	
+	int clear = LB_RESETCONTENT;
+	int msg = LB_ADDSTRING;
+	if (cb) {
+		msg = CB_ADDSTRING;
+		clear = CB_RESETCONTENT;
+	}
+
+	SendDlgItemMessageW(hWnd, controlID, clear, NULL, NULL);
+
+	drBST.ExecutePostorder([&](Doctor& doc) {
+		std::wstring aux = doc.ProfessionalID() + L" "
+			+ doc.GetName(Names::FIRST_NAME) + L" "
+			+ doc.GetName(Names::FIRST_LASTNAME);
+		SendDlgItemMessageW(hWnd, controlID, msg, NULL, (LPARAM)aux.c_str());
+		});
+
+}
+
+void UpdatePatientList(HWND hWnd, List<Patient>& patList, int controlID, bool cb) {
+
+	int clear = LB_RESETCONTENT;
+	int msg = LB_ADDSTRING;
+	if (cb) {
+		msg = CB_ADDSTRING;
+		clear = CB_RESETCONTENT;
+	}
+
+	SendDlgItemMessageW(hWnd, controlID, clear, NULL, NULL);
+
+	patList.ForEach([&](Patient& pat) {
+		std::wstring aux = std::to_wstring(pat.Key()) + L" "
+			+ pat.GetName(Names::FIRST_NAME) + L" "
+			+ pat.GetName(Names::FIRST_LASTNAME);
+		SendDlgItemMessageW(hWnd, controlID, msg, NULL, (LPARAM)aux.c_str());
+		});
+
+}
+
+void UpdateSpecialityList(HWND hWnd, List<Speciality>& speList, int controlID, bool cb) {
+
+	int clear = LB_RESETCONTENT;
+	int msg = LB_ADDSTRING;
+	if (cb) {
+		msg = CB_ADDSTRING;
+		clear = CB_RESETCONTENT;
+	}
+
+	SendDlgItemMessageW(hWnd, controlID, clear, NULL, NULL);
+
+	speList.ForEach([&](Speciality& spe) {
+		std::wstring aux = std::to_wstring(spe.Key()) + L" " + spe.Name();
+		SendDlgItemMessageW(hWnd, controlID, msg, NULL, (LPARAM)aux.c_str());
+		});
+
+}
+
+void UpdateAppointmentList(HWND hWnd, List<Appointment>& appList, int controlID, bool cb) {
+
+	int clear = LB_RESETCONTENT;
+	int msg = LB_ADDSTRING;
+	if (cb) {
+		msg = CB_ADDSTRING;
+		clear = CB_RESETCONTENT;
+	}
+
+	SendDlgItemMessageW(hWnd, controlID, clear, NULL, NULL);
+
+	appList.ForEach([&](Appointment& app) {
+		DateTime appDT = app.GetDateTime();
+		std::wstring aux = std::to_wstring(app.Key()) + L" CITA" + appDT.DateTimeWstring();
+		SendDlgItemMessageW(hWnd, controlID, msg, NULL, (LPARAM)aux.c_str());
+		});
+
+}
+
+void UpdateMedicalOfficeList(HWND hWnd, List<MedOffice>& moList, int controlID, bool cb) {
+
+	int clear = LB_RESETCONTENT;
+	int msg = LB_ADDSTRING;
+	if (cb) {
+		msg = CB_ADDSTRING;
+		clear = CB_RESETCONTENT;
+	}
+
+	SendDlgItemMessageW(hWnd, controlID, clear, NULL, NULL);
+
+	moList.ForEach([&](MedOffice& medoff) {
+		std::wstring aux = std::to_wstring(medoff.Number()) + L" Consultorio";
+		SendDlgItemMessageW(hWnd, controlID, msg, NULL, (LPARAM)aux.c_str());
+		});
+
+}
+
 #pragma endregion Miscelaneous
 
 #pragma region Query_App_Window
@@ -1048,6 +1143,9 @@ void GetDoctorRegisterInfo(HWND hWnd, Doctor& doctor) {
 	//Get medical office
 	doctor.SetMedOfficeNumber(GetKeyFromCB(hWnd, IDC_RM_MO_COMBO));
 
+	//Get speciality
+	doctor.SetSpeciality(GetKeyFromCB(hWnd, IDC_RM_SPE_COMBO));
+
 }
 
 ValidationError ValidateDoctorRegister(HWND hWnd) {
@@ -1697,6 +1795,22 @@ unsigned int DoctorsPerSpeciality(unsigned int key, BinarySearchTree<Doctor>& dr
 		});
 
 	return count;
+
+}
+
+void ShowSpecialityDoctors(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
+
+	std::vector<Doctor> buffer;
+	unsigned int speKey = GetKeyFromLB(hWnd, IDC_SPE_LIST);
+	if (speKey != 0) {
+		DoctorsPerSpeciality(speKey, drBST, &buffer);
+		for (Doctor& doc : buffer) {
+			std::wstring aux = doc.ProfessionalID() + L" "
+				+ doc.GetName(Names::FIRST_NAME) + L" "
+				+ doc.GetName(Names::FIRST_LASTNAME);
+			SendDlgItemMessageW(hWnd, IDC_DR_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		}
+	}
 
 }
 
