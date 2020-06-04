@@ -48,6 +48,25 @@ bool Date::SetDate(const SYSTEMTIME& systemTime) {
 
 }
 
+SYSTEMTIME Date::GetSystemTimeStruct() const {
+
+	SYSTEMTIME st;
+	memset(&st, 0, sizeof(SYSTEMTIME));
+	st.wDay = this->m_day;
+	st.wMonth = this->m_month;
+	st.wYear = this->m_year;
+
+	return st;
+
+}
+
+std::wstring Date::DateString() const {
+	
+	std::wstring aux = std::to_wstring(m_day) + L"/" + std::to_wstring(m_day) + L"/" + std::to_wstring(m_year);
+
+	return aux;
+}
+
 void Date::SetToday() {
 
 	SYSTEMTIME rightNow;

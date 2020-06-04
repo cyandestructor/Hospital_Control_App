@@ -22,6 +22,10 @@ BOOL CALLBACK QueryAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 BOOL CALLBACK RegPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK RegMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK RegSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK ViewAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK ViewPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK ViewMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK ViewSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void IWGQueryApp(HWND hWnd);
 void IWGRegApp(HWND hWnd);
@@ -220,6 +224,7 @@ BOOL CALLBACK QueryAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		switch (LOWORD(wParam)) {
 		case IDC_QA_SEARCHDR_CMD:
+			QASearchDoctor(hWnd, g_doctorBST);
 			break;
 		case IDC_QA_SEARCHAPP_CMD:
 
@@ -252,10 +257,13 @@ BOOL CALLBACK QueryAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			EnableWindow(GetDlgItem(hWnd, IDC_QA_MO_COMBO), FALSE);	//Disable the Medical office query
 			break;
 		case IDC_QA_LOOKAPP_CMD:
+			ViewSelectedAppointment(hWnd, g_appList, (DLGPROC)ViewAppWinProc);
 			break;
 		case IDC_QA_MARKAPP_CMD:
+			MarkApp(hWnd, g_appList, g_medOffList);
 			break;
 		case IDC_QA_CANCELAPP_CMD:
+			CancelApp(hWnd, g_appList, g_medOffList);
 			break;
 		
 		}
@@ -316,8 +324,11 @@ BOOL CALLBACK RegPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 			ClearPatientRegister(hWnd);
 			break;
 		case IDC_RP_LOOKPATIENT_CMD:
+			ViewSelectedPatient(hWnd, g_patientList, (DLGPROC)ViewPatientWinProc);
 			break;
 		case IDC_RP_DELETEREG_CMD:
+			DeleteSelectedPatient(hWnd, g_patientList);
+			UpdatePatientList(hWnd, g_patientList, IDC_PATIENT_LIST);
 			break;
 		case IDC_RP_GENREPORT_CMD:
 			SavePatientReport(hWnd, g_patientList);
@@ -367,8 +378,10 @@ BOOL CALLBACK RegMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			LoadDoctorImg(hWnd, 150, 150);
 			break;
 		case IDC_RM_LOOKDR_CMD:
+			ViewSelectedDoctor(hWnd, g_doctorBST, (DLGPROC)ViewMedWinProc);
 			break;
 		case IDC_RM_DELETEREG_CMD:
+			DeleteSelectedDoctor(hWnd, g_doctorBST);
 			break;
 		case IDC_RM_GENREPORT_CMD:
 			SaveDoctorReport(hWnd, g_doctorBST);
@@ -393,7 +406,7 @@ BOOL CALLBACK RegSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 
 	case WM_INITDIALOG:
-		InitRegSpeControls(hWnd);
+		InitRegSpeControls(hWnd, IWGRegSpe);
 		break;
 	case WM_COMMAND:
 
@@ -415,17 +428,226 @@ BOOL CALLBACK RegSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			ClearSpeRegister(hWnd);
 			break;
 		case IDC_RS_LOOKSPE_CMD:
+			ViewSelectedSpeciality(hWnd, g_speList, (DLGPROC)ViewSpeWinProc);
 			break;
 		case IDC_RS_DELETESPE_CMD:
+			DeleteSelectedSpeciality(hWnd, g_speList, g_doctorBST);
 			break;
 		case IDC_RS_LOOKDRLIST_CMD:
 			ShowSpecialityDoctors(hWnd, g_doctorBST);
 			break;
 		case IDC_RS_LOOKDRINFO_CMD:
+			ViewSelectedDoctor(hWnd, g_doctorBST, (DLGPROC)ViewMedWinProc);
 			break;
 
 		}
 
+		break;
+	default:
+		return FALSE;
+
+	}
+
+	return TRUE;
+
+}
+
+BOOL CALLBACK ViewAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+
+	//ValidationError validationError;
+	static Appointment* appInfo = nullptr;
+	Doctor appDr;
+	Patient appPatient;
+	Speciality appSpe;
+
+	switch (msg) {
+
+	case WM_INITDIALOG:
+		appInfo = (Appointment*)lParam;	//Get the info passed through the parameter
+		appDr = appInfo->GetDoctorInfo(g_doctorBST);
+		appPatient = appInfo->GetPatientInfo(g_patientList);
+		//TODO GET SPE INFO
+		ShowAppointmentInfo(hWnd, *appInfo, appPatient, appDr, appSpe);
+		break;
+	case WM_COMMAND:
+
+		switch (LOWORD(wParam)) {
+
+		case IDC_RETURN_CMD:
+			SendMessageW(hWnd, WM_CLOSE, NULL, NULL);
+			break;
+
+		}
+
+		break;
+	case WM_CLOSE:
+	case WM_DESTROY:
+		appInfo = nullptr;
+		break;
+	default:
+		return FALSE;
+
+	}
+
+	return TRUE;
+
+}
+
+BOOL CALLBACK ViewPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+
+	ValidationError validationError;
+	static Patient* patientInfo = nullptr;
+
+	switch (msg) {
+
+	case WM_INITDIALOG:
+		patientInfo = (Patient*)lParam;	//Get the info passed through the parameter
+		InitRegPatientControls(hWnd);
+		ShowPatientInfo(hWnd, *patientInfo);
+		break;
+	case WM_COMMAND:
+
+		switch (LOWORD(wParam)) {
+		
+		case IDC_EDIT_PATIENT_CMD:
+			EnablePatientEdit(hWnd, true);
+			break;
+		case IDC_SAVE_EDIT_PAT_CMD:
+			//EDITION PROCESS
+			validationError = ValidatePatientRegister(hWnd);
+			if (validationError.errorCode == ErrorCode::EC_NO_ERROR) {
+				EditPatient(hWnd, *patientInfo);
+				SendMessageW(hWnd, WM_CLOSE, NULL, NULL);
+			}
+			else {
+				InterpretValidationError(validationError, true, hWnd, IDC_RP_ERROR_LOG);
+			}
+			break;
+		case IDC_CANCEL_EDIT_PAT_CMD:
+			EnablePatientEdit(hWnd, false);
+			ShowPatientInfo(hWnd, *patientInfo);
+			break;
+		case IDC_RETURN_CMD:
+			SendMessageW(hWnd, WM_CLOSE, NULL, NULL);
+			break;
+		
+		}
+
+		break;
+	case WM_CLOSE:
+	case WM_DESTROY:
+		patientInfo = nullptr;
+		break;
+	default:
+		return FALSE;
+
+	}
+
+	return TRUE;
+
+}
+
+BOOL CALLBACK ViewMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+
+	ValidationError validationError;
+	static Doctor* drInfo = nullptr;
+
+	switch (msg) {
+
+	case WM_INITDIALOG:
+		drInfo = (Doctor*)lParam;	//Get the info passed through the parameter
+		InitRegMedControls(hWnd);
+		ShowDoctorInfo(hWnd, *drInfo);
+		break;
+	case WM_COMMAND:
+
+		switch (LOWORD(wParam)) {
+
+		case IDC_EDIT_DR_CMD:
+			EnableDoctorEdit(hWnd, true);
+			break;
+		case IDC_SAVE_EDIT_DR_CMD:
+			validationError = ValidateDoctorEdition(hWnd);
+			if (validationError.errorCode == ErrorCode::EC_NO_ERROR) {
+				EditDoctor(hWnd, *drInfo);
+				SendMessageW(hWnd, WM_CLOSE, NULL, NULL);
+			}
+			else {
+				InterpretValidationError(validationError, true, hWnd, IDC_RM_ERROR_LOG);
+			}
+			break;
+		case IDC_CANCEL_EDIT_DR_CMD:
+			EnableDoctorEdit(hWnd, false);
+			ShowDoctorInfo(hWnd, *drInfo);
+			break;
+		case IDC_VM_LOADIMG_CMD:
+			LoadDoctorImg(hWnd, 150, 150);
+			break;
+		case IDC_RETURN_CMD:
+			SendMessageW(hWnd, WM_CLOSE, NULL, NULL);
+			break;
+
+		}
+
+		break;
+	case WM_CLOSE:
+	case WM_DESTROY:
+		drInfo = nullptr;	//Clear the pointer
+		break;
+	default:
+		return FALSE;
+
+	}
+
+	return TRUE;
+
+}
+
+BOOL CALLBACK ViewSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+
+	ValidationError validationError;
+	static Speciality* speInfo = nullptr;
+
+	switch (msg) {
+
+	case WM_INITDIALOG:
+		speInfo = (Speciality*)lParam;	//Get the info passed through the parameter
+		InitRegSpeControls(hWnd);
+		ShowSpecialityInfo(hWnd, *speInfo);
+		break;
+	case WM_COMMAND:
+
+		switch (LOWORD(wParam)) {
+
+		case IDC_EDIT_SPE_CMD:
+			EnableSpecialityEdit(hWnd, true);
+			break;
+		case IDC_SAVE_EDIT_SPE_CMD:
+
+			validationError = ValidateSpeRegister(hWnd);
+			if (validationError.errorCode == ErrorCode::EC_NO_ERROR) {
+				GetSpeRegisterInfo(hWnd, *speInfo);	//Get Info
+				SendMessageW(hWnd, WM_CLOSE, NULL, NULL);
+			}
+			else {
+				InterpretValidationError(validationError, true, hWnd, IDC_RS_ERROR_LOG);
+			}
+
+			break;
+		case IDC_CANCEL_EDIT_SPE_CMD:
+			EnableSpecialityEdit(hWnd, false);
+			ShowSpecialityInfo(hWnd, *speInfo);
+			break;
+		case IDC_RETURN_CMD:
+			SendMessageW(hWnd, WM_CLOSE, NULL, NULL);
+			break;
+
+		}
+
+		break;
+	case WM_CLOSE:
+	case WM_DESTROY:
+		speInfo = nullptr;
 		break;
 	default:
 		return FALSE;

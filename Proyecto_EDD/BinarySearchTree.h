@@ -12,6 +12,8 @@ public:
 	void Insert(const T& element) override { InternInsert(this->m_root, element); }
 	void Delete(const T& element) override { InternDelete(this->m_root, element); }
 
+	//This is illegal, delete later
+	bool BinarySearch(T** retVal, const T& val) { return InternBinarySearch(retVal, this->m_root, val); }
 	bool BinarySearch(T& retVal, const T& val) const { return InternBinarySearch(retVal, this->m_root, val); }
 
 private:
@@ -19,6 +21,7 @@ private:
 	void InternDelete(std::unique_ptr<BTNode<T>>& root, const T& element);
 	std::unique_ptr<BTNode<T>>& GetMin(std::unique_ptr<BTNode<T>>& root);
 	bool InternBinarySearch(T& retVal, const std::unique_ptr<BTNode<T>>& root, const T& val) const;
+	bool InternBinarySearch(T** retVal, const std::unique_ptr<BTNode<T>>& root, const T& val);	//This is illegal, delete later
 
 };
 
@@ -115,6 +118,25 @@ bool BinarySearchTree<T>::InternBinarySearch(T& retVal, const std::unique_ptr<BT
 
 	return false;
 
+}
+
+template<typename T>
+bool BinarySearchTree<T>::InternBinarySearch(T** retVal, const std::unique_ptr<BTNode<T>>& root, const T& val) {
+	
+	if (root != nullptr) {
+
+		if (root->content == val) {
+			*retVal = &root->content;
+			return true;
+		}
+		else if (val < root->content)
+			return InternBinarySearch(retVal, root->left, val);
+		else if (val > root->content)
+			return InternBinarySearch(retVal, root->right, val);
+
+	}
+
+	return false;
 }
 
 #endif

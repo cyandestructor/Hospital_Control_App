@@ -79,6 +79,7 @@ const Date& Person::Birthdate() const {
 unsigned short Person::Age() const {
 
 	//TODO CALCULATE AGE
+	return 0;
 
 }
 

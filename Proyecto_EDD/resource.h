@@ -13,6 +13,7 @@
 #define IDD_VIEW_APP                    109
 #define IDD_VIEW_MED                    110
 #define IDD_VIEW_PATIENT                111
+#define IDD_VIEW_SPE                    112
 #define IDC_COMBO1                      1002
 #define IDC_RP_GENDER_COMBO             1002
 #define IDC_COMBO2                      1003
@@ -47,12 +48,12 @@
 #define IDC_COMBO5                      1010
 #define IDC_QA_MONTH_COMBO              1010
 #define IDC_RP_PHONENUM_EDIT            1010
-#define IDC_RA_DOUBLEAPP_CHECK2         1010
+#define IDC_ATT_CHECK                   1010
 #define IDC_EDIT3                       1011
 #define IDC_COMBO6                      1011
 #define IDC_QA_SPE_COMBO                1011
 #define IDC_RP_H_EDIT                   1011
-#define IDC_RA_DOUBLEAPP_CHECK3         1011
+#define IDC_CANCEL_CHECK                1011
 #define IDC_EDIT4                       1012
 #define IDC_DATETIMEPICKER3             1012
 #define IDC_RM_SCHE_FROM_DTP            1012
@@ -80,6 +81,7 @@
 #define IDC_RETURN_CMD                  1021
 #define IDC_BUTTON3                     1022
 #define IDC_RS_LOOKSPE_CMD              1022
+#define IDC_RETURN_CMD2                 1022
 #define IDC_LIST1                       1023
 #define IDC_SPE_LIST                    1023
 #define IDC_BUTTON4                     1024
@@ -137,13 +139,13 @@
 #define IDC_RM_PROID_EDIT               1064
 #define IDC_RM_GENDER_COMBO             1065
 #define IDC_RM_MO_COMBO                 1066
+#define IDC_MO_EDIT                     1066
 #define IDC_DR_LIST                     1067
 #define IDC_RM_BIRTHD_DTP               1068
 #define IDC_RM_LOADIMG_CMD              1069
 #define IDC_RM_LOOKDR_CMD               1070
 #define IDC_RM_DELETEREG_CMD            1071
 #define IDC_RP_SNAME_EDIT               1072
-#define IDC_RM_GENDER_COMBO2            1072
 #define IDC_RM_SPE_COMBO                1072
 #define IDC_PATIENT_LIST                1073
 #define IDC_RP_REGPATIENT_CMD           1074
@@ -161,6 +163,10 @@
 #define IDC_EDIT_PATIENT_CMD            1086
 #define IDC_CANCEL_EDIT_PAT_CMD         1087
 #define IDC_SAVE_EDIT_PAT_CMD           1088
+#define IDC_VM_LOADIMG_CMD              1088
+#define IDC_EDIT_SPE_CMD                1089
+#define IDC_SAVE_EDIT_SPE_CMD           1090
+#define IDC_CANCEL_EDIT_SPE_CMD         1091
 #define CMD_REG_MED                     40004
 #define CMD_REG_PATIENT                 40005
 #define CMD_REG_DOC                     40006
@@ -175,7 +181,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        111
 #define _APS_NEXT_COMMAND_VALUE         40011
-#define _APS_NEXT_CONTROL_VALUE         1088
+#define _APS_NEXT_CONTROL_VALUE         1092
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

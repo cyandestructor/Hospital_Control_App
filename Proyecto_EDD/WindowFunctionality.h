@@ -40,6 +40,7 @@ bool GetAppByWeek(List<Appointment>& appList, const DateTime& dateTimeRef, List<
 void ShowQuery(HWND hWnd, List<Appointment>& appList);
 void SaveQueryFile(List<Appointment>& appList, List<Patient>& patList, BinarySearchTree<Doctor>& drBST, const wchar_t* fileName);
 void ClearQuery(HWND hWnd, List<Appointment>& qBuffer);
+void ViewSelectedAppointment(HWND hWnd, List<Appointment>& appList, DLGPROC viewerProc);
 TimePeriod GetWeekFromDate(const DateTime& dateTimeRef);
 
 //Register Appointment Window
@@ -63,7 +64,7 @@ bool ValidateDoctorPerMO(HWND hWnd, BinarySearchTree<Doctor>& drBST, Doctor& toV
 void ClearDoctorRegister(HWND hWnd);
 void LoadDoctorImg(HWND hWnd, int width, int height);
 bool GetImageFilename(HWND parent, std::wstring& buffer);
-void ViewSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST);
+void ViewSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST, DLGPROC viewerProc);
 void DeleteSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST);
 void SaveDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST);
 void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstring& filePath);
@@ -75,7 +76,7 @@ void GetPatientRegisterInfo(HWND hWnd, Patient& patient);
 ValidationError ValidatePatientRegister(HWND hWnd);
 void ClearPatientRegister(HWND hWnd);
 Patient& FindPatientWithKey(List<Patient>& patList, unsigned int key);
-void ViewSelectedPatient(HWND hWnd);	//TODO
+void ViewSelectedPatient(HWND hWnd, List<Patient>& patList, DLGPROC viewerProc);
 void DeleteSelectedPatient(HWND hWnd, List<Patient>& patList);	//TODO
 void SavePatientReport(HWND hWnd, List<Patient>& patList);
 void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& filepath);
@@ -86,10 +87,28 @@ void InitRegSpeControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetSpeRegisterInfo(HWND hWnd, Speciality& speciality);
 ValidationError ValidateSpeRegister(HWND hWnd);
 void ClearSpeRegister(HWND hWnd);
-void ViewSelectedSpeciality(HWND hWnd);	//TODO
+void ViewSelectedSpeciality(HWND hWnd, List<Speciality>& speList, DLGPROC viewerProc);
 void DeleteSelectedSpeciality(HWND hWnd, List<Speciality>& speList, BinarySearchTree<Doctor>& drBST);
 unsigned int DoctorsPerSpeciality(unsigned int key, BinarySearchTree<Doctor>& drBST, std::vector<Doctor>* buffer = 0);
 void ShowSpecialityDoctors(HWND hWnd, BinarySearchTree<Doctor>& drBST);
+
+//View Appointment Window
+void ShowAppointmentInfo(HWND hWnd, Appointment& app, Patient& patient, Doctor& doctor, Speciality& spe);
+
+//View Patient Window
+void ShowPatientInfo(HWND hWnd, Patient& pat);
+void EditPatient(HWND hWnd, Patient& pat);
+void EnablePatientEdit(HWND hWnd, bool enable);
+
+//View Doctor Window
+void ShowDoctorInfo(HWND hWnd, Doctor& dr);
+void EditDoctor(HWND hWnd, Doctor& dr);
+ValidationError ValidateDoctorEdition(HWND hWnd);
+void EnableDoctorEdit(HWND hWnd, bool enable);
+
+//View Speciality Window
+void ShowSpecialityInfo(HWND hWnd, Speciality& spe);
+void EnableSpecialityEdit(HWND hWnd, bool enable);
 
 //File Management
 

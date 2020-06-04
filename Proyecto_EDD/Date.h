@@ -2,6 +2,7 @@
 #define _DATE_CLASS_
 
 #include <Windows.h>
+#include <string>
 
 class Date {
 
@@ -11,6 +12,8 @@ public:
 	Date(const SYSTEMTIME& systemTime);
 	bool SetDate(unsigned short day, unsigned short month, unsigned short year);
 	bool SetDate(const SYSTEMTIME& systemTime);
+	SYSTEMTIME GetSystemTimeStruct() const;
+	std::wstring DateString() const;
 	void SetToday();
 	virtual void AddTime(unsigned short days, unsigned short months, unsigned short years);
 	unsigned short WeekDay() const;

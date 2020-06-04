@@ -16,6 +16,8 @@ public:
 	Schedule();
 	void SetWorkDay(unsigned short weekDay, bool isWorkDay);
 	bool IsWorkDay(unsigned short weekDay) const;
+	const bool* GetWorkDays() const { return m_workDays; }
+	const std::vector<TimePeriod>& GetReservedTime() const { return m_reservedTime; }
 	bool ConflictWith(const Schedule& other, SchValidate validate) const;
 	bool IsReserved(const DateTime& from, const DateTime& to) const;
 	bool IsAvailable(const DateTime& from, const DateTime& to) const;

@@ -774,6 +774,18 @@ void ClearQuery(HWND hWnd, List<Appointment>& qBuffer) {
 
 }
 
+void ViewSelectedAppointment(HWND hWnd, List<Appointment>& appList, DLGPROC viewerProc) {
+
+	unsigned int key = GetKeyFromLB(hWnd, IDC_QA_APP_LIST);
+
+	Appointment& appRef = appList.Search<unsigned int>(key, [](const Appointment& app, const unsigned int& _key) {
+		return app.Key() == _key;
+		});
+
+	CreateDialogParamW(NULL, MAKEINTRESOURCEW(IDD_VIEW_APP), hWnd, viewerProc, (LPARAM)&appRef);
+
+}
+
 TimePeriod GetWeekFromDate(const DateTime& dateTimeRef) {
 
 	unsigned short weekDayRef = dateTimeRef.WeekDay();
@@ -1009,6 +1021,7 @@ void SelectPatient(HWND hWnd, int comboBoxID, List<Patient>& patList) {
 		SetDlgItemTextW(hWnd, IDC_PATIENT_H_EDIT, std::to_wstring(temp.Height()).c_str());
 		SetDlgItemTextW(hWnd, IDC_PATIENT_W_EDIT, std::to_wstring(temp.Weight()).c_str());
 		SetDlgItemTextW(hWnd, IDC_PATIENT_BLOOD_EDIT, temp.GetBloodTypeString().c_str());
+		SetDlgItemTextW(hWnd, IDC_PATIENT_BIRTHD_EDIT, temp.Birthdate().DateString().c_str());
 
 	}
 
@@ -1356,14 +1369,15 @@ bool GetImageFilename(HWND parent, std::wstring& buffer) {
 
 }
 
-void ViewSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
+void ViewSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST, DLGPROC viewerProc) {
 
 	unsigned long id = GetIDFromLB(hWnd, IDC_DR_LIST);
 
 	Doctor key(id);
+	Doctor* drRef = nullptr;
 
-	if (drBST.BinarySearch(key, key)) {
-		//TODO: CREATE THE VIEW DIALOG
+	if (drBST.BinarySearch(&drRef, key)) {
+		CreateDialogParamW(NULL, MAKEINTRESOURCEW(IDD_VIEW_MED), hWnd, viewerProc, (LPARAM)drRef);
 	}
 
 }
@@ -1485,11 +1499,15 @@ void InitRegPatientControls(HWND hWnd, void(*initWithGlobals)(HWND)) {
 
 }
 
-void ViewSelectedPatient(HWND hWnd) {
+void ViewSelectedPatient(HWND hWnd, List<Patient>& patList, DLGPROC viewerProc) {
 
 	unsigned int key = GetKeyFromLB(hWnd, IDC_PATIENT_LIST);
 
-	//TODO: Create view dialog
+	Patient& patRef = patList.Search<unsigned int>(key, [](const Patient& pat, const unsigned int& _key) {
+		return pat.Key() == _key;
+		});
+
+	CreateDialogParamW(NULL, MAKEINTRESOURCEW(IDD_VIEW_PATIENT), hWnd, viewerProc, (LPARAM)&patRef);
 
 }
 
@@ -1747,11 +1765,14 @@ void ClearSpeRegister(HWND hWnd) {
 
 }
 
-void ViewSelectedSpeciality(HWND hWnd) {
+void ViewSelectedSpeciality(HWND hWnd, List<Speciality>& speList, DLGPROC viewerProc) {
 
 	unsigned int key = GetKeyFromLB(hWnd, IDC_SPE_LIST);
+	Speciality& speRef = speList.Search<unsigned int>(key, [](const Speciality& spe, const unsigned int& _key) {
+		return spe.Key() == _key;
+		});
 
-	//TODO: Create view dialog
+	CreateDialogParamW(NULL, MAKEINTRESOURCEW(IDD_VIEW_SPE), hWnd, viewerProc, (LPARAM)&speRef);
 
 }
 
@@ -1856,6 +1877,349 @@ void SaveFiles(List<Appointment>& appList,
 }
 
 #pragma endregion File_Management
+
+#pragma region View_Appointment_Window
+
+void ShowAppointmentInfo(HWND hWnd, Appointment& app, Patient& patient, Doctor& doctor, Speciality& spe) {
+
+	//Write app info
+	SetDlgItemTextW(hWnd, IDC_DESC_EDIT, app.GetDescription().c_str());
+	SetDlgItemTextW(hWnd, IDC_DATETIME_EDIT, app.GetDateTime().DateTimeWstring().c_str());
+	SetDlgItemTextW(hWnd, IDC_MEDOFFNUM_EDIT, std::to_wstring(app.GetMedOfficeKey()).c_str());
+	SetDlgItemTextW(hWnd, IDC_PHONENUM_EDIT, app.GetPhoneNumber().PhoneNumberString(true).c_str());
+
+	//Write patient info
+	SetDlgItemTextW(hWnd, IDC_PATIENT_NAME_EDIT, patient.GetName(Names::FULL_NAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_PATIENT_GENDER_EDIT, patient.GetGenderString().c_str());
+	SetDlgItemTextW(hWnd, IDC_PATIENT_AGE_EDIT, std::to_wstring(patient.Age()).c_str());
+	SetDlgItemTextW(hWnd, IDC_PATIENT_H_EDIT, std::to_wstring(patient.Height()).c_str());
+	SetDlgItemTextW(hWnd, IDC_PATIENT_W_EDIT, std::to_wstring(patient.Weight()).c_str());
+	SetDlgItemTextW(hWnd, IDC_PATIENT_BLOOD_EDIT, patient.GetBloodTypeString().c_str());
+	SetDlgItemTextW(hWnd, IDC_PATIENT_BIRTHD_EDIT, patient.Birthdate().DateString().c_str());
+
+	//Write doctor info
+	SetDlgItemTextW(hWnd, IDC_DR_NAME_EDIT, doctor.GetName(Names::FULL_NAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_DR_PROID_EDIT, doctor.ProfessionalID().c_str());
+	SetPictureControlImg(doctor.GetImagePath().c_str(), 300, 300, hWnd, IDC_DR_IMG);
+
+	//Write speciality info
+	SetDlgItemTextW(hWnd, IDC_DR_SPE_EDIT, spe.Name().c_str());
+
+	//Mark checkboxes
+	SendDlgItemMessageW(hWnd, IDC_RA_DOUBLEAPP_CHECK, BM_SETCHECK, (WPARAM)app.IsDouble(), NULL);
+	SendDlgItemMessageW(hWnd, IDC_ATT_CHECK, BM_SETCHECK, (WPARAM)app.IsAttended(), NULL);
+	SendDlgItemMessageW(hWnd, IDC_CANCEL_CHECK, BM_SETCHECK, (WPARAM)app.IsCanceled(), NULL);
+
+}
+
+#pragma endregion View_Appointment_Window
+
+#pragma region View_Patient_Window
+
+void ShowPatientInfo(HWND hWnd, Patient& pat) {
+
+	//Write patient info
+	SetDlgItemTextW(hWnd, IDC_RP_FNAME_EDIT, pat.GetName(Names::FIRST_NAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_RP_SNAME_EDIT, pat.GetName(Names::SECOND_NAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_RP_FLNAME_EDIT, pat.GetName(Names::FIRST_LASTNAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_RP_SLNAME_EDIT, pat.GetName(Names::SECOND_LASTNAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_RP_PHONENUM_EDIT, pat.GetPhoneNumber().PhoneNumberString(false).c_str());
+	SetDlgItemTextW(hWnd, IDC_RP_H_EDIT, std::to_wstring(pat.Height()).c_str());
+	SetDlgItemTextW(hWnd, IDC_RP_W_EDIT, std::to_wstring(pat.Weight()).c_str());
+	SetDlgItemTextW(hWnd, IDC_RP_REFER_EDIT, pat.Reference().c_str());
+
+	//Set combo boxes
+	SendDlgItemMessageW(hWnd, IDC_RP_GENDER_COMBO, CB_SETCURSEL, (WPARAM)pat.GetGender(), NULL);
+	SendDlgItemMessageW(hWnd, IDC_RP_BLOOD_COMBO, CB_SETCURSEL, (WPARAM)pat.GetBloodType(), NULL);
+
+	//Set Birthdate
+	Date bd = pat.Birthdate();
+	SendDlgItemMessageW(hWnd, IDC_RP_BIRTHD_DTP, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&bd.GetSystemTimeStruct());
+
+}
+
+void EditPatient(HWND hWnd, Patient& patient) {
+
+	//Get edit controls data
+	{	//Gettig name
+		std::wstring fname, sname, flname, slname;
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RP_FNAME_EDIT), fname);
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RP_SNAME_EDIT), sname);
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RP_FLNAME_EDIT), flname);
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RP_SLNAME_EDIT), slname);
+		patient.SetName(fname, sname, flname, slname);
+	}
+	std::wstring aux;
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_RP_PHONENUM_EDIT), aux);	//Phone number
+	patient.GetPhoneNumber().SetPhoneNumber(aux);
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_RP_H_EDIT), aux);			//Height
+	patient.SetHeight((unsigned int)_wtoi(aux.c_str()));
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_RP_W_EDIT), aux);			//Weight
+	patient.SetWeigth((float)_wtof(aux.c_str()));
+
+	//Get blood type
+	int selection = (int)SendDlgItemMessageW(hWnd, IDC_RP_BLOOD_COMBO, CB_GETCURSEL, NULL, NULL);
+	patient.SetBloodType((BloodType)selection);
+
+	//Get Gender
+	selection = (int)SendDlgItemMessageW(hWnd, IDC_RP_GENDER_COMBO, CB_GETCURSEL, NULL, NULL);
+	patient.SetGender((Gender)selection);
+
+	//Get Birthdate
+	SYSTEMTIME bdate;
+	SendDlgItemMessageW(hWnd, IDC_RP_BIRTHD_DTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&bdate);
+	patient.SetBirthdate(Date(bdate));
+
+}
+
+void EnablePatientEdit(HWND hWnd, bool enable) {
+
+	HWND controls[13];
+	controls[0] = GetDlgItem(hWnd, IDC_RP_FNAME_EDIT);
+	controls[1] = GetDlgItem(hWnd, IDC_RP_SNAME_EDIT);
+	controls[2] = GetDlgItem(hWnd, IDC_RP_FLNAME_EDIT);
+	controls[3] = GetDlgItem(hWnd, IDC_RP_SLNAME_EDIT);
+	controls[4] = GetDlgItem(hWnd, IDC_RP_PHONENUM_EDIT);
+	controls[5] = GetDlgItem(hWnd, IDC_RP_BIRTHD_DTP);
+	controls[6] = GetDlgItem(hWnd, IDC_RP_H_EDIT);
+	controls[7] = GetDlgItem(hWnd, IDC_RP_W_EDIT);
+	controls[8] = GetDlgItem(hWnd, IDC_RP_GENDER_COMBO);
+	controls[9] = GetDlgItem(hWnd, IDC_RP_BLOOD_COMBO);
+	controls[10] = GetDlgItem(hWnd, IDC_RP_REFER_EDIT);
+	controls[11] = GetDlgItem(hWnd, IDC_SAVE_EDIT_PAT_CMD);
+	controls[12] = GetDlgItem(hWnd, IDC_CANCEL_EDIT_PAT_CMD);
+
+	for (int i = 0; i < 13; i++)
+		EnableWindow(controls[i], enable);
+
+	EnableWindow(GetDlgItem(hWnd, IDC_EDIT_PATIENT_CMD), !enable);
+
+}
+
+#pragma endregion View_Patient_Window
+
+#pragma region View_Doctor_Window
+
+void ShowDoctorInfo(HWND hWnd, Doctor& dr) {
+
+	//edit controls
+	SetDlgItemTextW(hWnd, IDC_RM_DR_FNAME_EDIT, dr.GetName(Names::FIRST_NAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_RM_DR_SNAME_EDIT, dr.GetName(Names::SECOND_NAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_RM_DR_FLNAME_EDIT, dr.GetName(Names::FIRST_LASTNAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_RM_DR_SLNAME_EDIT, dr.GetName(Names::SECOND_LASTNAME).c_str());
+	SetDlgItemTextW(hWnd, IDC_RM_PHONENUM_EDIT, dr.GetPhoneNumber().PhoneNumberString(false).c_str());
+	SetDlgItemTextW(hWnd, IDC_RM_PROID_EDIT, dr.ProfessionalID().c_str());
+	SetDlgItemTextW(hWnd, IDC_RM_PROID_EDIT, std::to_wstring(dr.GetMedOfficeNum()).c_str());
+
+	//combo boxes
+	SendDlgItemMessageW(hWnd, IDC_RM_GENDER_COMBO, CB_SETCURSEL, (WPARAM)dr.GetGender(), NULL);
+	
+	//date time pickers
+	TimePeriod mainSchedule;
+	if (!dr.GetSchedule().GetReservedTime().empty())
+		mainSchedule = dr.GetSchedule().GetReservedTime()[0];
+
+	SendDlgItemMessageW(hWnd, IDC_RM_BIRTHD_DTP, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&dr.Birthdate().GetSystemTimeStruct());
+	SendDlgItemMessageW(hWnd, IDC_RM_SCHE_FROM_DTP, DTM_SETSYSTEMTIME, GDT_VALID,(LPARAM)&mainSchedule.Begin().GetSystemTimeStruct());
+	SendDlgItemMessageW(hWnd, IDC_RM_SCHE_TO_DTP, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&mainSchedule.End().GetSystemTimeStruct());
+
+	//checkers
+	HWND checkBoxes[5];
+	checkBoxes[0] = GetDlgItem(hWnd, IDC_RM_MON_CHECK);	//Monday
+	checkBoxes[1] = GetDlgItem(hWnd, IDC_RM_TUE_CHECK);	//Tuesday
+	checkBoxes[2] = GetDlgItem(hWnd, IDC_RM_WED_CHECK);	//Wednesday
+	checkBoxes[3] = GetDlgItem(hWnd, IDC_RM_THU_CHECK);	//Thursday
+	checkBoxes[4] = GetDlgItem(hWnd, IDC_RM_FRI_CHECK);	//Friday
+	const bool* workDays = dr.GetSchedule().GetWorkDays();
+
+	for (int i = 0; i < 5; i++) {
+		SendMessageW(checkBoxes[i], BM_SETCHECK, (WPARAM)workDays[i + 1], NULL);
+	}
+
+	//image
+	SetPictureControlImg(dr.GetImagePath().c_str(), 300, 300, hWnd, IDC_DR_IMG);
+
+}
+
+void EditDoctor(HWND hWnd, Doctor& doctor) {
+
+	{	//Get edit control and static text info
+		std::wstring fname, sname, flname, slname;
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RM_DR_FNAME_EDIT), fname);	//First name
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RM_DR_SNAME_EDIT), sname);	//Second name
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RM_DR_FLNAME_EDIT), flname);	//First last name
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RM_DR_SLNAME_EDIT), slname);	//Second last name
+		doctor.SetName(fname, sname, flname, slname);
+
+		std::wstring aux;
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RM_PHONENUM_EDIT), aux);		//Phone number
+		doctor.GetPhoneNumber().SetPhoneNumber(aux);
+		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RM_IMGPATH), aux);			//Img file path
+		doctor.SetImagePath(aux);
+	}
+
+	{	//Get date time pickers info
+		SYSTEMTIME bdate, from, to;
+		SendDlgItemMessageW(hWnd, IDC_RM_BIRTHD_DTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&bdate);		//Birth date
+		doctor.SetBirthdate(Date(bdate));
+		SendDlgItemMessageW(hWnd, IDC_RM_SCHE_FROM_DTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&from);	//Schedule
+		SendDlgItemMessageW(hWnd, IDC_RM_SCHE_TO_DTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&to);
+		doctor.GetSchedule().Free();
+		doctor.GetSchedule().Reserve(DateTime(from), DateTime(to));
+	}
+
+	{	//Get check boxes state
+		HWND checkBoxes[5];
+		checkBoxes[0] = GetDlgItem(hWnd, IDC_RM_MON_CHECK);	//Monday
+		checkBoxes[1] = GetDlgItem(hWnd, IDC_RM_TUE_CHECK);	//Tuesday
+		checkBoxes[2] = GetDlgItem(hWnd, IDC_RM_WED_CHECK);	//Wednesday
+		checkBoxes[3] = GetDlgItem(hWnd, IDC_RM_THU_CHECK);	//Thursday
+		checkBoxes[4] = GetDlgItem(hWnd, IDC_RM_FRI_CHECK);	//Friday
+
+		for (int i = 0; i < 5; i++) {
+			bool isWorkDay = (bool)SendMessageW(checkBoxes[i], BM_GETCHECK, NULL, NULL);
+			if (isWorkDay)
+				doctor.GetSchedule().SetWorkDay((unsigned int)(i + 1), isWorkDay);
+
+		}
+	}
+
+	//Get gender
+	HWND genderCB = GetDlgItem(hWnd, IDC_RM_GENDER_COMBO);	//Gender
+	Gender gender = (Gender)SendMessageW(genderCB, CB_GETCURSEL, NULL, NULL);
+	doctor.SetGender(gender);
+
+}
+
+ValidationError ValidateDoctorEdition(HWND hWnd) {
+	
+	ValidationError validationError = { ErrorCode::EC_NO_ERROR, NULL };
+
+	{	//Validate edit Controls
+		HWND editControls[5];
+		editControls[0] = GetDlgItem(hWnd, IDC_RM_DR_FNAME_EDIT);	//First name
+		editControls[1] = GetDlgItem(hWnd, IDC_RM_DR_SNAME_EDIT);	//Second name
+		editControls[2] = GetDlgItem(hWnd, IDC_RM_DR_FLNAME_EDIT);	//First last name
+		editControls[3] = GetDlgItem(hWnd, IDC_RM_DR_SLNAME_EDIT);	//Second last name
+		editControls[4] = GetDlgItem(hWnd, IDC_RM_PHONENUM_EDIT);	//Phone number
+
+		for (int i = 0; i < 5; i++) {
+			if (GetWindowTextLengthW(editControls[i]) == 0) {
+				validationError.errorCode = ErrorCode::EC_EMPTY;
+				validationError.errorSrc = editControls[i];
+				break;
+			}
+		}
+
+		//Validate phone number length
+		if (GetWindowTextLengthW(editControls[4]) < 10) {
+			validationError.errorCode = ErrorCode::EC_INVALID_SIZE;
+			validationError.errorSrc = editControls[4];
+		}
+	}
+
+	{	//Validate combo boxes
+		HWND genderCB = GetDlgItem(hWnd, IDC_RM_GENDER_COMBO);	//Gender
+		if (SendMessageW(genderCB, CB_GETCURSEL, NULL, NULL) == CB_ERR) {
+			validationError.errorCode = ErrorCode::EC_NO_SEL;
+			validationError.errorSrc = genderCB;
+		}
+	}
+
+	{	//Validate birthdate
+		SYSTEMTIME bdate;
+		HWND bdateDTP = GetDlgItem(hWnd, IDC_RM_BIRTHD_DTP);
+		SendMessageW(bdateDTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&bdate);
+		DateTime bdateDT(bdate);
+		if (bdateDT > DateTime::RightNow()) {
+			validationError.errorCode = ErrorCode::EC_INVALID_DATE;
+			validationError.errorSrc = bdateDTP;
+		}
+	}
+
+	{	//validate check boxes (at least one checked)
+		HWND checkBoxes[5];
+		checkBoxes[0] = GetDlgItem(hWnd, IDC_RM_MON_CHECK);	//Monday
+		checkBoxes[1] = GetDlgItem(hWnd, IDC_RM_TUE_CHECK);	//Tuesday
+		checkBoxes[2] = GetDlgItem(hWnd, IDC_RM_WED_CHECK);	//Wednesday
+		checkBoxes[3] = GetDlgItem(hWnd, IDC_RM_THU_CHECK);	//Thursday
+		checkBoxes[4] = GetDlgItem(hWnd, IDC_RM_FRI_CHECK);	//Friday
+
+		bool allUnchecked = true;
+
+		for (int i = 0; i < 5; i++) {
+			if (SendMessageW(checkBoxes[i], BM_GETCHECK, NULL, NULL) == BST_CHECKED) {
+				allUnchecked = false;
+				break;
+			}
+		}
+
+		if (allUnchecked) {
+			validationError.errorCode = ErrorCode::EC_NO_SEL;
+			validationError.errorSrc = checkBoxes[0];
+		}
+
+	}
+
+	return validationError;
+
+}
+
+void EnableDoctorEdit(HWND hWnd, bool enable) {
+
+	HWND controls[18];
+	controls[0] = GetDlgItem(hWnd, IDC_RM_DR_FNAME_EDIT);
+	controls[1] = GetDlgItem(hWnd, IDC_RM_DR_SNAME_EDIT);
+	controls[2] = GetDlgItem(hWnd, IDC_RM_DR_FLNAME_EDIT);
+	controls[3] = GetDlgItem(hWnd, IDC_RM_DR_SLNAME_EDIT);
+	controls[4] = GetDlgItem(hWnd, IDC_RM_PHONENUM_EDIT);
+	controls[5] = GetDlgItem(hWnd, IDC_RM_BIRTHD_DTP);
+	controls[6] = GetDlgItem(hWnd, IDC_RM_PROID_EDIT);
+	controls[7] = GetDlgItem(hWnd, IDC_RM_SCHE_FROM_DTP);
+	controls[8] = GetDlgItem(hWnd, IDC_RM_GENDER_COMBO);
+	controls[9] = GetDlgItem(hWnd, IDC_RM_SCHE_TO_DTP);
+	controls[10] = GetDlgItem(hWnd, IDC_VM_LOADIMG_CMD);
+	controls[11] = GetDlgItem(hWnd, IDC_RM_MON_CHECK);
+	controls[12] = GetDlgItem(hWnd, IDC_RM_TUE_CHECK);
+	controls[13] = GetDlgItem(hWnd, IDC_RM_WED_CHECK);
+	controls[14] = GetDlgItem(hWnd, IDC_RM_THU_CHECK);
+	controls[15] = GetDlgItem(hWnd, IDC_RM_FRI_CHECK);
+	controls[10] = GetDlgItem(hWnd, IDC_SAVE_EDIT_DR_CMD);
+	controls[10] = GetDlgItem(hWnd, IDC_CANCEL_EDIT_DR_CMD);
+
+	for (int i = 0; i < 16; i++)
+		EnableWindow(controls[i], enable);
+
+	EnableWindow(GetDlgItem(hWnd, IDC_EDIT_DR_CMD), !enable);
+
+}
+
+#pragma endregion View_Doctor_Window
+
+#pragma region View_Speciality_Window
+
+void ShowSpecialityInfo(HWND hWnd, Speciality& spe) {
+
+	SetDlgItemTextW(hWnd, IDC_RS_SPENAME_EDIT, spe.Name().c_str());
+	SetDlgItemTextW(hWnd, IDC_RS_SPEDESC_EDIT, spe.Description().c_str());
+
+}
+
+void EnableSpecialityEdit(HWND hWnd, bool enable) {
+
+	HWND controls[4];
+	controls[0] = GetDlgItem(hWnd, IDC_RS_SPENAME_EDIT);
+	controls[1] = GetDlgItem(hWnd, IDC_RS_SPEDESC_EDIT);
+	controls[2] = GetDlgItem(hWnd, IDC_SAVE_EDIT_SPE_CMD);
+	controls[3] = GetDlgItem(hWnd, IDC_CANCEL_EDIT_SPE_CMD);
+
+	for (int i = 0; i < 4; i++)
+		EnableWindow(controls[i], enable);
+
+	EnableWindow(GetDlgItem(hWnd, IDC_EDIT_SPE_CMD), !enable);
+}
+
+#pragma endregion View_Speciality_Window
 
 #pragma region Control_Subclasses
 
