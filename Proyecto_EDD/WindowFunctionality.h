@@ -6,6 +6,7 @@
 
 #define MAIN_FOLDER L"\\SistemaClínica"
 #define DATA_FOLDER L"\\Data"
+#define IMG_FOLDER L"\\Img"
 #define ID_FLOAT_EDIT_CONTROL	66000
 #define ID_ALPHA_EDIT_CONTROL	66001
 
@@ -77,9 +78,11 @@ ValidationError ValidatePatientRegister(HWND hWnd);
 void ClearPatientRegister(HWND hWnd);
 Patient& FindPatientWithKey(List<Patient>& patList, unsigned int key);
 void ViewSelectedPatient(HWND hWnd, List<Patient>& patList, DLGPROC viewerProc);
-void DeleteSelectedPatient(HWND hWnd, List<Patient>& patList);	//TODO
+void DeleteSelectedPatient(HWND hWnd, List<Patient>& patList, List<Appointment>& appList);
 void SavePatientReport(HWND hWnd, List<Patient>& patList);
 void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& filepath);
+unsigned int AppointmentsPerPatient(unsigned int patKey, List<Appointment>& appList, 
+	std::vector<Appointment>* buffer = nullptr);
 
 //Register Speciality Window
 
@@ -93,25 +96,30 @@ unsigned int DoctorsPerSpeciality(unsigned int key, BinarySearchTree<Doctor>& dr
 void ShowSpecialityDoctors(HWND hWnd, BinarySearchTree<Doctor>& drBST);
 
 //View Appointment Window
+
 void ShowAppointmentInfo(HWND hWnd, Appointment& app, Patient& patient, Doctor& doctor, Speciality& spe);
 
 //View Patient Window
+
 void ShowPatientInfo(HWND hWnd, Patient& pat);
 void EditPatient(HWND hWnd, Patient& pat);
 void EnablePatientEdit(HWND hWnd, bool enable);
 
 //View Doctor Window
+
 void ShowDoctorInfo(HWND hWnd, Doctor& dr);
 void EditDoctor(HWND hWnd, Doctor& dr);
 ValidationError ValidateDoctorEdition(HWND hWnd);
 void EnableDoctorEdit(HWND hWnd, bool enable);
 
 //View Speciality Window
+
 void ShowSpecialityInfo(HWND hWnd, Speciality& spe);
 void EnableSpecialityEdit(HWND hWnd, bool enable);
 
 //File Management
 
+void CreateAppDirectory();
 void LoadFiles(List<Appointment>& appList,
 	List<Patient>& patList,
 	List<Speciality>& speList,

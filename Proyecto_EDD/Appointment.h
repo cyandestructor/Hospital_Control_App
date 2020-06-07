@@ -14,6 +14,7 @@ class Appointment {
 public:
 	Appointment();
 	void SetPatient(unsigned int key);
+	unsigned int GetPatient() const { return m_patientKey; }
 	const Patient& GetPatientInfo(List<Patient>& patientList) const;
 	void SetDoctor(unsigned long id);
 	unsigned long GetDoctorKey() const;

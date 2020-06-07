@@ -27,6 +27,7 @@ public:
 		unsigned short hour, unsigned short minute);
 
 	friend std::ostream& operator<<(std::ostream& os, const DateTime& dt);
+	friend std::wostream& operator<<(std::wostream& os, const DateTime& dt);
 	friend bool operator==(const DateTime& firstDateTime, const DateTime& secondDateTime);
 	friend bool operator!=(const DateTime& firstDateTime, const DateTime& secondDateTime);
 	friend bool operator<(const DateTime& firstDateTime, const DateTime& secondDateTime);

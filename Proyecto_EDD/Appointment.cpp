@@ -134,7 +134,7 @@ unsigned int Appointment::GenKey() const {
 	//Get the sum of the month, the day, the hour and the minute of the appointment date time
 	short b = m_dateTime.Month() + m_dateTime.Day() + m_dateTime.Hour() + m_dateTime.Minute();
 
-	m_key = a + b;
+	m_key = a + b + m_patientKey;
 	return m_key;
 }
 

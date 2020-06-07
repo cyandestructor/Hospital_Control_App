@@ -114,3 +114,11 @@ std::ostream& operator<<(std::ostream& os, const DateTime& dt) {
 
 	return os;
 }
+
+std::wostream& operator<<(std::wostream& os, const DateTime& dt) {
+
+	os << dt.m_day << L"/" << dt.m_month << L"/" << dt.m_year << L" "
+		<< std::setfill(L'0') << std::setw(2) << dt.m_hour << std::setw(1) << L":" << std::setw(2) << dt.m_minute;
+
+	return os;
+}

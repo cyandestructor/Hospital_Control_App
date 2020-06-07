@@ -47,6 +47,9 @@ int GetWindowTextWstring(HWND hWnd, std::wstring& buffer) {
 		GetWindowTextW(hWnd, &buffer[0], textSize + 1);
 		buffer.resize(textSize);
 	}
+	else {
+		buffer = L"";
+	}
 
 	return textSize;
 
@@ -194,7 +197,7 @@ unsigned int GetKeyFromLB(HWND hWnd, int lbID) {
 	if (lbID != 0)
 		listBox = GetDlgItem(hWnd, lbID);
 
-	int sel = SendMessageW(listBox, CB_GETCURSEL, NULL, NULL);
+	int sel = SendMessageW(listBox, LB_GETCURSEL, NULL, NULL);
 
 	if (sel != LB_ERR) {
 		std::wstring aux;
@@ -354,6 +357,31 @@ void UpdateMedicalOfficeList(HWND hWnd, List<MedOffice>& moList, int controlID, 
 
 }
 
+std::wstring CopyImageFile(const std::wstring& imgFile, const std::wstring& directory) {
+
+	static int index = 0;
+
+	std::wstring newFilePath;
+	BOOL created;
+	DWORD error;
+	std::wstring filename;
+
+	do {
+
+		filename = std::to_wstring(index) + L".JPG";
+		newFilePath = directory + L"\\" + filename;
+
+		created = CopyFileW(imgFile.c_str(), newFilePath.c_str(), TRUE);
+		error = GetLastError();
+
+		index++;
+
+	} while (!created);
+
+	return newFilePath;
+
+}
+
 #pragma endregion Miscelaneous
 
 #pragma region Query_App_Window
@@ -495,7 +523,7 @@ void QueryDoctorMonth(HWND hWnd, List<Appointment>& appList, List<Appointment>& 
 
 	//Get Dr profesional ID
 	std::wstring aux;
-	GetWindowTextWstring(hWnd, aux);
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_QA_PID_EDIT), aux);
 	unsigned long proID = std::stoul(aux);
 
 	//Get Month
@@ -694,7 +722,7 @@ void ShowQuery(HWND hWnd, List<Appointment>& appList) {
 
 void SaveQueryFile(List<Appointment>& appList, List<Patient>& patList, BinarySearchTree<Doctor>& drBST, const wchar_t* fileName) {
 
-	ofstream queryFile;
+	std::wofstream queryFile;
 
 	std::wstring appDirectory = DocumentsDirectory() + MAIN_FOLDER;
 	int res = _wmkdir(appDirectory.c_str());
@@ -717,22 +745,22 @@ void SaveQueryFile(List<Appointment>& appList, List<Patient>& patList, BinarySea
 			queryFile << L"# Consultorio: " << app.GetMedOfficeKey() << std::endl;
 			queryFile << L"Cod. Especialidad: " << appDr.GetSpeciality() << std::endl;
 			queryFile << L"Fecha: " << app.GetDateTime() << std::endl;
-			queryFile << L"Médico: " << appDr.GetName(Names::FULL_NAME).c_str() << std::endl;
-			queryFile << L"Paciente: " << appPat.GetName(Names::FULL_NAME).c_str() << std::endl;
-			queryFile << L"Tel: " << appPat.GetPhoneNumber().PhoneNumberString(true).c_str() << std::endl;
-			queryFile << L"Atendida: " << "si" << std::endl;
-			queryFile << L"Cancelada: " << "no" << std::endl;
+			queryFile << L"Médico: " << appDr.GetName(Names::FULL_NAME) << std::endl;
+			queryFile << L"Paciente: " << appPat.GetName(Names::FULL_NAME) << std::endl;
+			queryFile << L"Tel: " << appPat.GetPhoneNumber().PhoneNumberString(true) << std::endl;
+			queryFile << L"Atendida: " << ((app.IsAttended()) ? L"si" : L"no") << std::endl;
+			queryFile << L"Cancelada: " << ((app.IsCanceled() ? L"si" : L"no")) << std::endl;
 			queryFile << L"-----------------------------------------------" << std::endl;
 
 			});
 
 		queryFile.close();
 		std::wstring msgBox = L"Se generó un archivo de texto con su consulta en: " + fullpath;
-		MessageBoxW(NULL, L"Guardado completo", msgBox.c_str(), MB_ICONEXCLAMATION | MB_OK);
+		MessageBoxW(NULL, msgBox.c_str(), L"Guardado completo", MB_ICONEXCLAMATION | MB_OK);
 
 	}
 	else {
-		MessageBoxW(NULL, L"Error al abrir el archivo", L"El archivo no se pudo abrir", MB_ICONEXCLAMATION | MB_OK);
+		MessageBoxW(NULL, L"El archivo no se pudo abrir", L"Error al abrir el archivo", MB_ICONEXCLAMATION | MB_OK);
 	}
 
 }
@@ -805,6 +833,8 @@ void InitRegAppControls(HWND hWnd, void(*initWithGlobals)(HWND)) {
 	
 	if (initWithGlobals)
 		initWithGlobals(hWnd);
+
+	SendDlgItemMessageW(hWnd, IDC_RA_SELSPE_COMBO, CB_INSERTSTRING, 0, (LPARAM)L"TODOS");
 
 	SendDlgItemMessageW(hWnd, IDC_RA_DESC_EDIT, EM_SETLIMITTEXT, 300, NULL);	//DESCRIPT EDIT CONTROL
 	SendDlgItemMessageW(hWnd, IDC_RA_PHONENUM_EDIT, EM_SETLIMITTEXT, 10, NULL);	//PHONE NUM EDIT CONTROL
@@ -891,17 +921,15 @@ ValidationError ValidateAppRegister(HWND hWnd) {
 	timeDTP = GetDlgItem(hWnd, IDC_RA_APPTIME_DTP);
 
 	SendMessageW(dateDTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&appDate);
-
 	SendMessageW(timeDTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&appTime);
 
-	DateTime date(appDate), time(appTime);
-	if (date < DateTime::RightNow()) {
+	appDate.wHour = appTime.wHour;
+	appDate.wMinute = appTime.wMinute;
+
+	DateTime dateTime(appDate);
+	if (dateTime < DateTime::RightNow()) {
 		errorCode = ErrorCode::EC_INVALID_DATE;
 		errorSrc = dateDTP;
-	}
-	else if (time < DateTime::RightNow()) {
-		errorCode = ErrorCode::EC_INVALID_DATE;
-		errorSrc = timeDTP;
 	}
 
 	ValidationError validationError = { errorCode, errorSrc };
@@ -939,7 +967,7 @@ bool ValidDrSchAppTime(const Appointment& app, BinarySearchTree<Doctor>& drBST) 
 void ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& moList) {
 
 	//Get the info of the selected medical office
-	MedOffice selMO = app.GetMedOffice(moList);
+	MedOffice& selMO = app.GetMedOffice(moList);
 	
 	DateTime beginTime = app.GetDateTime(), endTime = app.GetDateTime();
 	bool error = false;
@@ -965,11 +993,12 @@ void ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& m
 	}
 
 	if (error) {
-		MessageBoxW(NULL, L"Error", L"Ya hay una cita a esa hora", MB_ICONERROR | MB_OK);
+		MessageBoxW(NULL, L"Ya hay una cita a esa hora", L"Error", MB_ICONERROR | MB_OK);
 	}
 	else {
 		appList.Push(app);
-		MessageBoxW(NULL, L"Reserva", L"Se he reservado la cita", MB_ICONEXCLAMATION | MB_OK);
+		std::wstring msg = L"Se ha reservado la cita con código: " + std::to_wstring(app.Key());
+		MessageBoxW(NULL, msg.c_str(), L"Reserva", MB_ICONEXCLAMATION | MB_OK);
 	}
 
 }
@@ -985,6 +1014,15 @@ void ClearAppRegister(HWND hWnd) {
 	//clear edit controls
 	SetDlgItemTextW(hWnd, IDC_RA_DESC_EDIT, L"");
 	SetDlgItemTextW(hWnd, IDC_RA_PHONENUM_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_PATIENT_NAME_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_PATIENT_NAME_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_PATIENT_GENDER_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_PATIENT_H_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_PATIENT_W_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_PATIENT_BLOOD_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_PATIENT_BIRTHD_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_DR_NAME_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_DR_PROID_EDIT, L"");
 
 	//restart date time pickers
 	SYSTEMTIME now;
@@ -994,6 +1032,9 @@ void ClearAppRegister(HWND hWnd) {
 
 	//restart check box
 	SendDlgItemMessageW(hWnd, IDC_RA_DOUBLEAPP_CHECK, BM_SETCHECK, BST_UNCHECKED, NULL);
+
+	//clear picture control
+	SetPictureControlImg(L"", 170, 170, hWnd, IDC_DR_IMG);
 
 }
 
@@ -1035,42 +1076,33 @@ void SelectDoctor(HWND hWnd, int comboBoxID, BinarySearchTree<Doctor>& drList) {
 	if (drList.BinarySearch(temp, temp)) {
 		SetDlgItemTextW(hWnd, IDC_DR_NAME_EDIT, temp.GetName(Names::FULL_NAME).c_str());
 		SetDlgItemTextW(hWnd, IDC_DR_PROID_EDIT, temp.ProfessionalID().c_str());
-		SetPictureControlImg(temp.GetImagePath().c_str(), 300, 300, hWnd, IDC_DR_IMG);
+		SetPictureControlImg(temp.GetImagePath().c_str(), 170, 170, hWnd, IDC_DR_IMG);
 	}
 
 }
 
 void FilterDoctorsWithSpeciality(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
 
-	List<Doctor> tempList;
+	if (SendDlgItemMessageW(hWnd, IDC_RA_SELSPE_COMBO, CB_GETCURSEL, NULL, NULL) != 0) {
+		//Get the speciality key
+		unsigned int key = GetKeyFromCB(hWnd, IDC_RA_SELSPE_COMBO);
+		//Get the doctors with that speciality
+		std::vector<Doctor> buffer;
+		DoctorsPerSpeciality(key, drBST, &buffer);
 
-	//Get the speciality key
-	unsigned int key = GetKeyFromCB(hWnd, IDC_RA_SELSPE_COMBO);
-	//Get the doctors with that speciality
-	std::vector<Doctor> buffer;
-	DoctorsPerSpeciality(key, drBST, &buffer);
-
-	//drBST.ExecutePreorder([&](Doctor& dr) {
-	//	if (dr.GetSpeciality() == key)
-	//		tempList.Push(dr);	//Save in the list
-	//	});
-
-	//Restart the combo box
-	SendDlgItemMessageW(hWnd, IDC_RA_SELDR_COMBO, CB_RESETCONTENT, NULL, NULL);
-	//Add the doctors with that speciality
-	for (Doctor& doc : buffer) {
-		std::wstring aux = doc.ProfessionalID() + L" "
-			+ doc.GetName(Names::FIRST_NAME) + L" "
-			+ doc.GetName(Names::FIRST_LASTNAME);
-		SendDlgItemMessageW(hWnd, IDC_RA_SELDR_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		//Restart the combo box
+		SendDlgItemMessageW(hWnd, IDC_RA_SELDR_COMBO, CB_RESETCONTENT, NULL, NULL);
+		//Add the doctors with that speciality
+		for (Doctor& doc : buffer) {
+			std::wstring aux = doc.ProfessionalID() + L" "
+				+ doc.GetName(Names::FIRST_NAME) + L" "
+				+ doc.GetName(Names::FIRST_LASTNAME);
+			SendDlgItemMessageW(hWnd, IDC_RA_SELDR_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
+		}
 	}
-
-	/*tempList.ForEach([&](Doctor& doc) {
-		std::wstring aux = doc.ProfessionalID() + L" "
-			+ doc.GetName(Names::FIRST_NAME) + L" "
-			+ doc.GetName(Names::FIRST_LASTNAME);
-		SendDlgItemMessageW(hWnd, IDC_RA_SELDR_COMBO, CB_ADDSTRING, NULL, (LPARAM)aux.c_str());
-		});*/
+	else {
+		UpdateDoctorList(hWnd, drBST, IDC_RA_SELDR_COMBO, true);
+	}
 
 }
 
@@ -1120,7 +1152,10 @@ void GetDoctorRegisterInfo(HWND hWnd, Doctor& doctor) {
 		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RM_PROID_EDIT), aux);			//Profesional id
 		doctor.SetProfessionalID(std::stoul(aux));
 		GetWindowTextWstring(GetDlgItem(hWnd, IDC_RM_IMGPATH), aux);			//Img file path
-		doctor.SetImagePath(aux);
+		if (aux != L"") {
+			aux = CopyImageFile(aux, DocumentsDirectory() + MAIN_FOLDER + IMG_FOLDER);
+			doctor.SetImagePath(aux);
+		}
 	}
 
 	{	//Get date time pickers info
@@ -1265,11 +1300,11 @@ bool ValidateDoctorPerMO(HWND hWnd, BinarySearchTree<Doctor>& drBST, Doctor& toV
 	}
 
 	if (conflict) {
-		MessageBoxW(hWnd, L"Error", L"Ya hay un doctor en el mismo horario y consultorio",
+		MessageBoxW(hWnd, L"Ya hay un doctor en el mismo horario y consultorio", L"Error",
 			MB_ICONERROR | MB_OK);
 	}
 	
-	return conflict;
+	return !conflict;
 
 }
 
@@ -1420,7 +1455,7 @@ void SaveDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
 
 void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstring& filePath) {
 
-	std::ofstream file;
+	std::wofstream file;
 	//Create doctor list
 	List<Doctor> drList;
 	drBST.ExecutePostorder([&](Doctor& doc) {
@@ -1435,23 +1470,23 @@ void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstr
 
 		if (file.is_open()) {
 			drList.ForEach([&](Doctor& dr) {
-				file << dr.ProfessionalID().c_str() << L" "
-					<< dr.GetName(Names::FULL_NAME).c_str() << L" "
-					<< dr.GetPhoneNumber().PhoneNumberString(false).c_str() << std::endl;
+				file << dr.ProfessionalID() << L" "
+					<< dr.GetName(Names::FULL_NAME) << L" "
+					<< dr.GetPhoneNumber().PhoneNumberString(false) << std::endl;
 				});
 
 			file.close();
-			MessageBoxW(hWnd, L"Información de Archivo",
-				L"El reporte se ha guardado con éxito.", MB_ICONEXCLAMATION | MB_OK);
+			MessageBoxW(hWnd, L"El reporte se ha guardado con éxito.",
+				L"Información de Archivo", MB_ICONEXCLAMATION | MB_OK);
 		}
 		else {
-			MessageBoxW(hWnd, L"Error al guardar",
-				L"No se ha podido guardar el reporte.", MB_ICONERROR | MB_OK);
+			MessageBoxW(hWnd, L"No se ha podido guardar el reporte.",
+				L"Error al guardar", MB_ICONERROR | MB_OK);
 		}
 	}
 	else {
-		MessageBoxW(hWnd, L"Error al guardar",
-			L"No hay información para guardar.", MB_ICONERROR | MB_OK);
+		MessageBoxW(hWnd, L"No hay información para guardar.",
+			L"Error al guardar", MB_ICONERROR | MB_OK);
 	}
 
 }
@@ -1511,22 +1546,28 @@ void ViewSelectedPatient(HWND hWnd, List<Patient>& patList, DLGPROC viewerProc) 
 
 }
 
-void DeleteSelectedPatient(HWND hWnd, List<Patient>& patList) {
+void DeleteSelectedPatient(HWND hWnd, List<Patient>& patList, List<Appointment>& appList) {
 
-	unsigned int key = GetKeyFromLB(hWnd, IDC_SPE_LIST);
+	unsigned int key = GetKeyFromLB(hWnd, IDC_PATIENT_LIST);
 	int deleted = -1, i = 0;
 
-	//TODO: VALIDATE APPOINTMENTS WITH THAT PATIENT
+	//VALIDATE APPOINTMENTS WITH THAT PATIENT
+	if (AppointmentsPerPatient(key, appList) == 0) {
 
-	//Find the element with that key
-	patList.ForEach([&](Patient& pat) {
-		if (pat.Key() == key)
-			deleted = i;	//if found: save the current index
-		i++;
-		});
+		//Find the element with that key
+		patList.ForEach([&](Patient& pat) {
+			if (pat.Key() == key)
+				deleted = i;	//if found: save the current index
+			i++;
+			});
 
-	if (deleted > -1)
-		Patient tmp = patList.Delete((unsigned int)deleted);
+		if (deleted > -1)
+			Patient tmp = patList.Delete((unsigned int)deleted);
+	}
+	else {
+		MessageBoxW(NULL, L"El paciente ya tiene una cita registrada", L"No se ha podido eliminar",
+			MB_ICONERROR | MB_OK);
+	}
 
 }
 
@@ -1560,7 +1601,7 @@ void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& fil
 	size_t size = patList.Size();
 
 	if (patArray) {
-		ofstream file;
+		std::wofstream file;
 		file.open(filepath, ios::out | ios::trunc);
 
 		if (file.is_open()) {
@@ -1568,23 +1609,23 @@ void GenPatientReport(HWND hWnd, List<Patient>& patList, const std::wstring& fil
 			Heap<Patient>::HeapSort(patArray, size, HeapType::MIN_H);
 
 			for (size_t i = 0; i < size; i++) {
-				file << patArray[i].GetName(Names::LASTNAME_FIRST).c_str() << std::endl;
+				file << patArray[i].GetName(Names::LASTNAME_FIRST) << std::endl;
 			}
 
 			file.close();
-			MessageBoxW(hWnd, L"Información de Archivo",
-				L"El reporte se ha guardado con éxito.", MB_ICONEXCLAMATION | MB_OK);
+			MessageBoxW(hWnd, L"El reporte se ha guardado con éxito.",
+				L"Información de Archivo", MB_ICONEXCLAMATION | MB_OK);
 		}
 		else {
-			MessageBoxW(hWnd, L"Error al guardar",
-				L"No se ha podido guardar el reporte.", MB_ICONERROR | MB_OK);
+			MessageBoxW(hWnd, L"No se ha podido guardar el reporte.",
+				L"Error al guardar", MB_ICONERROR | MB_OK);
 		}
 
-		delete patArray;
+		delete[] patArray;
 	}
 	else {
-		MessageBoxW(hWnd, L"Error al guardar",
-			L"No hay información para guardar.", MB_ICONERROR | MB_OK);
+		MessageBoxW(hWnd, L"No hay información para guardar.",
+			L"Error al guardar", MB_ICONERROR | MB_OK);
 	}
 
 }
@@ -1607,6 +1648,8 @@ void GetPatientRegisterInfo(HWND hWnd, Patient& patient) {
 	patient.SetHeight((unsigned int)_wtoi(aux.c_str()));
 	GetWindowTextWstring(GetDlgItem(hWnd, IDC_RP_W_EDIT), aux);			//Weight
 	patient.SetWeigth((float)_wtof(aux.c_str()));
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_RP_REFER_EDIT), aux);		//Reference
+	patient.SetReference(aux);
 
 	//Get blood type
 	int selection = (int)SendDlgItemMessageW(hWnd, IDC_RP_BLOOD_COMBO, CB_GETCURSEL, NULL, NULL);
@@ -1684,6 +1727,22 @@ ValidationError ValidatePatientRegister(HWND hWnd) {
 	}
 
 	return validationError;
+
+}
+
+unsigned int AppointmentsPerPatient(unsigned int patKey, List<Appointment>& appList, std::vector<Appointment>* buffer) {
+
+	unsigned int count = 0;
+
+	appList.ForEach([&](Appointment& app) {
+		if (app.GetPatient() == patKey) {
+			count++;
+			if (buffer)
+				buffer->push_back(app);
+		}
+		});
+
+	return count;
 
 }
 
@@ -1796,7 +1855,7 @@ void DeleteSelectedSpeciality(HWND hWnd, List<Speciality>& speList, BinarySearch
 	}
 	else {
 		//Speciality cannot be deleted because there are doctors registered with that speciality
-		MessageBoxW(hWnd, L"No se ha podido eliminar", L"Uno o más doctores registrados con esta especialidad.",
+		MessageBoxW(hWnd, L"Uno o más doctores registrados con esta especialidad.", L"No se ha podido eliminar",
 			MB_ICONERROR | MB_OK);
 	}
 
@@ -1839,6 +1898,17 @@ void ShowSpecialityDoctors(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
 
 #pragma region File_Management
 
+void CreateAppDirectory() {
+
+	std::wstring mainAppDirectory = DocumentsDirectory() + MAIN_FOLDER;
+
+	//Create Directory
+	int res = _wmkdir(mainAppDirectory.c_str());
+	res = _wmkdir((mainAppDirectory + DATA_FOLDER).c_str());
+	res = _wmkdir((mainAppDirectory + IMG_FOLDER).c_str());
+
+}
+
 void LoadFiles(List<Appointment>& appList,
 	List<Patient>& patList,
 	List<Speciality>& speList,
@@ -1861,12 +1931,7 @@ void SaveFiles(List<Appointment>& appList,
 	List<MedOffice>& medOffList,
 	BinarySearchTree<Doctor>& drBST) {
 
-	std::wstring mainAppDirectory = DocumentsDirectory() + MAIN_FOLDER;
-
-	//Create Directory
-	int res = _wmkdir(mainAppDirectory.c_str());
-	mainAppDirectory += DATA_FOLDER;
-	res = _wmkdir(mainAppDirectory.c_str());
+	std::wstring mainAppDirectory = DocumentsDirectory() + MAIN_FOLDER + DATA_FOLDER;
 
 	appList.WriteToFile(mainAppDirectory + L"\\appoint.data");
 	patList.WriteToFile(mainAppDirectory + L"\\patient.data");
@@ -2009,7 +2074,7 @@ void ShowDoctorInfo(HWND hWnd, Doctor& dr) {
 	SetDlgItemTextW(hWnd, IDC_RM_DR_SLNAME_EDIT, dr.GetName(Names::SECOND_LASTNAME).c_str());
 	SetDlgItemTextW(hWnd, IDC_RM_PHONENUM_EDIT, dr.GetPhoneNumber().PhoneNumberString(false).c_str());
 	SetDlgItemTextW(hWnd, IDC_RM_PROID_EDIT, dr.ProfessionalID().c_str());
-	SetDlgItemTextW(hWnd, IDC_RM_PROID_EDIT, std::to_wstring(dr.GetMedOfficeNum()).c_str());
+	SetDlgItemTextW(hWnd, IDC_MO_EDIT, std::to_wstring(dr.GetMedOfficeNum()).c_str());
 
 	//combo boxes
 	SendDlgItemMessageW(hWnd, IDC_RM_GENDER_COMBO, CB_SETCURSEL, (WPARAM)dr.GetGender(), NULL);
@@ -2037,7 +2102,7 @@ void ShowDoctorInfo(HWND hWnd, Doctor& dr) {
 	}
 
 	//image
-	SetPictureControlImg(dr.GetImagePath().c_str(), 300, 300, hWnd, IDC_DR_IMG);
+	SetPictureControlImg(dr.GetImagePath().c_str(), 170, 170, hWnd, IDC_DR_IMG);
 
 }
 
@@ -2167,27 +2232,26 @@ ValidationError ValidateDoctorEdition(HWND hWnd) {
 
 void EnableDoctorEdit(HWND hWnd, bool enable) {
 
-	HWND controls[18];
+	HWND controls[17];
 	controls[0] = GetDlgItem(hWnd, IDC_RM_DR_FNAME_EDIT);
 	controls[1] = GetDlgItem(hWnd, IDC_RM_DR_SNAME_EDIT);
 	controls[2] = GetDlgItem(hWnd, IDC_RM_DR_FLNAME_EDIT);
 	controls[3] = GetDlgItem(hWnd, IDC_RM_DR_SLNAME_EDIT);
 	controls[4] = GetDlgItem(hWnd, IDC_RM_PHONENUM_EDIT);
 	controls[5] = GetDlgItem(hWnd, IDC_RM_BIRTHD_DTP);
-	controls[6] = GetDlgItem(hWnd, IDC_RM_PROID_EDIT);
-	controls[7] = GetDlgItem(hWnd, IDC_RM_SCHE_FROM_DTP);
-	controls[8] = GetDlgItem(hWnd, IDC_RM_GENDER_COMBO);
-	controls[9] = GetDlgItem(hWnd, IDC_RM_SCHE_TO_DTP);
-	controls[10] = GetDlgItem(hWnd, IDC_VM_LOADIMG_CMD);
-	controls[11] = GetDlgItem(hWnd, IDC_RM_MON_CHECK);
-	controls[12] = GetDlgItem(hWnd, IDC_RM_TUE_CHECK);
-	controls[13] = GetDlgItem(hWnd, IDC_RM_WED_CHECK);
-	controls[14] = GetDlgItem(hWnd, IDC_RM_THU_CHECK);
-	controls[15] = GetDlgItem(hWnd, IDC_RM_FRI_CHECK);
-	controls[10] = GetDlgItem(hWnd, IDC_SAVE_EDIT_DR_CMD);
-	controls[10] = GetDlgItem(hWnd, IDC_CANCEL_EDIT_DR_CMD);
+	controls[6] = GetDlgItem(hWnd, IDC_RM_SCHE_FROM_DTP);
+	controls[7] = GetDlgItem(hWnd, IDC_RM_GENDER_COMBO);
+	controls[8] = GetDlgItem(hWnd, IDC_RM_SCHE_TO_DTP);
+	controls[9] = GetDlgItem(hWnd, IDC_VM_LOADIMG_CMD);
+	controls[10] = GetDlgItem(hWnd, IDC_RM_MON_CHECK);
+	controls[11] = GetDlgItem(hWnd, IDC_RM_TUE_CHECK);
+	controls[12] = GetDlgItem(hWnd, IDC_RM_WED_CHECK);
+	controls[13] = GetDlgItem(hWnd, IDC_RM_THU_CHECK);
+	controls[14] = GetDlgItem(hWnd, IDC_RM_FRI_CHECK);
+	controls[15] = GetDlgItem(hWnd, IDC_SAVE_EDIT_DR_CMD);
+	controls[16] = GetDlgItem(hWnd, IDC_CANCEL_EDIT_DR_CMD);
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 17; i++)
 		EnableWindow(controls[i], enable);
 
 	EnableWindow(GetDlgItem(hWnd, IDC_EDIT_DR_CMD), !enable);

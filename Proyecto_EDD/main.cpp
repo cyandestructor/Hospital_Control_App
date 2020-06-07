@@ -83,13 +83,19 @@ BOOL CALLBACK MainWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	subwindows[3] : Registro de médicos
 	subwindows[4] :	Registro de especialidad
 	*/
+		//MedOffice mo1, mo2;
 
 	switch (msg) {
 
 	case WM_INITDIALOG:
 		hInstance = (HINSTANCE)lParam;
-		
+		CreateAppDirectory();
 		LoadFiles(g_appList, g_patientList, g_speList, g_medOffList, g_doctorBST);
+
+		/*mo1.SetNumber(1);
+		mo2.SetNumber(2);
+		g_medOffList.Push(mo2);
+		g_medOffList.Push(mo1);*/
 
 		//Registrar citas
 		subwindows[0] = CreateDialogParamW(hInstance, MAKEINTRESOURCEW(IDD_REG_APP),
@@ -285,6 +291,10 @@ BOOL CALLBACK QueryAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 
 		break;
+	case WM_SHOWWINDOW:
+		if (wParam)
+			IWGQueryApp(hWnd);	//UPDATE THE WINDOW
+		break;
 	default:
 		return FALSE;
 
@@ -325,9 +335,10 @@ BOOL CALLBACK RegPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 			break;
 		case IDC_RP_LOOKPATIENT_CMD:
 			ViewSelectedPatient(hWnd, g_patientList, (DLGPROC)ViewPatientWinProc);
+			UpdatePatientList(hWnd, g_patientList, IDC_PATIENT_LIST);
 			break;
 		case IDC_RP_DELETEREG_CMD:
-			DeleteSelectedPatient(hWnd, g_patientList);
+			DeleteSelectedPatient(hWnd, g_patientList, g_appList);
 			UpdatePatientList(hWnd, g_patientList, IDC_PATIENT_LIST);
 			break;
 		case IDC_RP_GENREPORT_CMD:
@@ -336,6 +347,10 @@ BOOL CALLBACK RegPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 		}
 
+		break;
+	case WM_SHOWWINDOW:
+		if (wParam)
+			IWGRegPatient(hWnd);	//UPDATE THE WINDOW
 		break;
 	default:
 		return FALSE;
@@ -363,9 +378,11 @@ BOOL CALLBACK RegMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			validationError = ValidateDoctorRegister(hWnd);
 			if (validationError.errorCode == ErrorCode::EC_NO_ERROR) {
 				GetDoctorRegisterInfo(hWnd, doctor);	//Get Info from controls
-				g_doctorBST.Insert(doctor);				//Insert in the doctor tree
-				ClearDoctorRegister(hWnd);				//Clear controls
-				UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
+				if (ValidateDoctorPerMO(hWnd, g_doctorBST, doctor)) {
+					g_doctorBST.Insert(doctor);				//Insert in the doctor tree
+					ClearDoctorRegister(hWnd);				//Clear controls
+					UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
+				}
 			}
 			else {
 				InterpretValidationError(validationError, true, hWnd, IDC_RM_ERROR_LOG);
@@ -379,15 +396,21 @@ BOOL CALLBACK RegMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			break;
 		case IDC_RM_LOOKDR_CMD:
 			ViewSelectedDoctor(hWnd, g_doctorBST, (DLGPROC)ViewMedWinProc);
+			UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
 			break;
 		case IDC_RM_DELETEREG_CMD:
 			DeleteSelectedDoctor(hWnd, g_doctorBST);
+			UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
 			break;
 		case IDC_RM_GENREPORT_CMD:
 			SaveDoctorReport(hWnd, g_doctorBST);
 			break;
 		}
 
+		break;
+	case WM_SHOWWINDOW:
+		if (wParam)
+			IWGRegDoctor(hWnd);	//UPDATE THE WINDOW
 		break;
 	default:
 		return FALSE;
@@ -429,19 +452,26 @@ BOOL CALLBACK RegSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			break;
 		case IDC_RS_LOOKSPE_CMD:
 			ViewSelectedSpeciality(hWnd, g_speList, (DLGPROC)ViewSpeWinProc);
+			UpdateSpecialityList(hWnd, g_speList, IDC_SPE_LIST);
 			break;
 		case IDC_RS_DELETESPE_CMD:
 			DeleteSelectedSpeciality(hWnd, g_speList, g_doctorBST);
+			UpdateSpecialityList(hWnd, g_speList, IDC_SPE_LIST);
 			break;
 		case IDC_RS_LOOKDRLIST_CMD:
 			ShowSpecialityDoctors(hWnd, g_doctorBST);
 			break;
 		case IDC_RS_LOOKDRINFO_CMD:
 			ViewSelectedDoctor(hWnd, g_doctorBST, (DLGPROC)ViewMedWinProc);
+			SendDlgItemMessageW(hWnd, IDC_DR_LIST, LB_RESETCONTENT, NULL, NULL);
 			break;
 
 		}
 
+		break;
+	case WM_SHOWWINDOW:
+		if (wParam)
+			IWGRegSpe(hWnd);	//UPDATE THE WINDOW
 		break;
 	default:
 		return FALSE;
@@ -483,6 +513,7 @@ BOOL CALLBACK ViewAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 	case WM_CLOSE:
 	case WM_DESTROY:
 		appInfo = nullptr;
+		EndDialog(hWnd, 1);
 		break;
 	default:
 		return FALSE;
@@ -537,6 +568,7 @@ BOOL CALLBACK ViewPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_CLOSE:
 	case WM_DESTROY:
 		patientInfo = nullptr;
+		EndDialog(hWnd, 1);
 		break;
 	default:
 		return FALSE;
@@ -593,6 +625,7 @@ BOOL CALLBACK ViewMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 	case WM_CLOSE:
 	case WM_DESTROY:
 		drInfo = nullptr;	//Clear the pointer
+		EndDialog(hWnd, 1);
 		break;
 	default:
 		return FALSE;
@@ -648,6 +681,7 @@ BOOL CALLBACK ViewSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 	case WM_CLOSE:
 	case WM_DESTROY:
 		speInfo = nullptr;
+		EndDialog(hWnd, 1);
 		break;
 	default:
 		return FALSE;
@@ -673,7 +707,7 @@ void IWGRegApp(HWND hWnd) {
 	UpdatePatientList(hWnd, g_patientList, IDC_RA_SELPATIENT_COMBO, true);
 	UpdateSpecialityList(hWnd, g_speList, IDC_RA_SELSPE_COMBO, true);
 	UpdateMedicalOfficeList(hWnd, g_medOffList, IDC_RA_SELMO_COMBO, true);
-	UpdateDoctorList(hWnd, g_doctorBST, IDC_RA_SELDR_COMBO, true);
+	//UpdateDoctorList(hWnd, g_doctorBST, IDC_RA_SELDR_COMBO, true);
 
 }
 
@@ -685,7 +719,8 @@ void IWGRegPatient(HWND hWnd) {
 
 void IWGRegDoctor(HWND hWnd) {
 
-	UpdateMedicalOfficeList(hWnd, g_medOffList, IDC_RM_MO_COMBO);
+	UpdateSpecialityList(hWnd, g_speList, IDC_RM_SPE_COMBO, true);
+	UpdateMedicalOfficeList(hWnd, g_medOffList, IDC_RM_MO_COMBO, true);
 	UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
 
 }
