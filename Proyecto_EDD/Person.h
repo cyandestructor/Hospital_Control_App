@@ -31,7 +31,7 @@ public:
 	std::wstring GetName(const Names name) const;
 	void SetBirthdate(const Date& date);
 	const Date& Birthdate() const;
-	unsigned short Age() const;
+	int Age() const;
 	void SetGender(Gender gender);
 	Gender GetGender() const;
 	std::wstring GetGenderString() const;

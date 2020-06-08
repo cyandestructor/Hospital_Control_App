@@ -16,6 +16,7 @@ public:
 	std::wstring DateString() const;
 	void SetToday();
 	virtual void AddTime(unsigned short days, unsigned short months, unsigned short years);
+	int DifferenceWith(const Date& date) const;
 	unsigned short WeekDay() const;
 	unsigned short Day() const;
 	unsigned short Month() const;
@@ -26,12 +27,14 @@ protected:
 	unsigned short m_month;
 	unsigned short m_year;
 
-	unsigned short DaysPerMonth(unsigned short month, unsigned short year);
+	unsigned short DaysPerMonth(unsigned short month, unsigned short year) const;
 	bool AddDays();
 	bool AddMonths();
 	virtual void ValidateDate();
 
 private:
+	int CountLeapYears() const;
+	int GetDaysFromDayZero() const;
 	bool IsLeap(unsigned short year) const;
 	unsigned short CenturyCode() const;
 	unsigned short YearCode() const;

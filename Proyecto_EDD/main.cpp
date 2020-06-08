@@ -175,8 +175,8 @@ BOOL CALLBACK RegAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			validationError = ValidateAppRegister(hWnd);
 			if (validationError.errorCode == ErrorCode::EC_NO_ERROR) {
 				GetAppRegisterInfo(hWnd, app);	//Get info from controls
-				ReserveApp(app, g_appList, g_medOffList);
-				ClearAppRegister(hWnd);
+				if (ReserveApp(app, g_appList, g_medOffList))
+					ClearAppRegister(hWnd);
 			}
 			else {
 				InterpretValidationError(validationError, true, hWnd, IDC_RA_ERROR_LOG);
@@ -205,6 +205,10 @@ BOOL CALLBACK RegAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
+		break;
+	case WM_SHOWWINDOW:
+		if (wParam)
+			IWGRegApp(hWnd);	//Update the Window
 		break;
 	default:
 		return FALSE;
@@ -399,7 +403,7 @@ BOOL CALLBACK RegMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
 			break;
 		case IDC_RM_DELETEREG_CMD:
-			DeleteSelectedDoctor(hWnd, g_doctorBST);
+			DeleteSelectedDoctor(hWnd, g_doctorBST, g_appList);
 			UpdateDoctorList(hWnd, g_doctorBST, IDC_DR_LIST);
 			break;
 		case IDC_RM_GENREPORT_CMD:
@@ -601,8 +605,10 @@ BOOL CALLBACK ViewMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 		case IDC_SAVE_EDIT_DR_CMD:
 			validationError = ValidateDoctorEdition(hWnd);
 			if (validationError.errorCode == ErrorCode::EC_NO_ERROR) {
-				EditDoctor(hWnd, *drInfo);
-				SendMessageW(hWnd, WM_CLOSE, NULL, NULL);
+				if (ValidateDoctorPerMO(hWnd, g_doctorBST, *drInfo)) {
+					EditDoctor(hWnd, *drInfo);
+					SendMessageW(hWnd, WM_CLOSE, NULL, NULL);
+				}
 			}
 			else {
 				InterpretValidationError(validationError, true, hWnd, IDC_RM_ERROR_LOG);
@@ -700,6 +706,7 @@ void IWGQueryApp(HWND hWnd) {
 
 	UpdateSpecialityList(hWnd, g_speList, IDC_QA_SPE_COMBO, true);
 	UpdateMedicalOfficeList(hWnd, g_medOffList, IDC_QA_MO_COMBO, true);
+
 }
 
 void IWGRegApp(HWND hWnd) {
@@ -708,6 +715,7 @@ void IWGRegApp(HWND hWnd) {
 	UpdateSpecialityList(hWnd, g_speList, IDC_RA_SELSPE_COMBO, true);
 	UpdateMedicalOfficeList(hWnd, g_medOffList, IDC_RA_SELMO_COMBO, true);
 	//UpdateDoctorList(hWnd, g_doctorBST, IDC_RA_SELDR_COMBO, true);
+	SendDlgItemMessageW(hWnd, IDC_RA_SELSPE_COMBO, CB_INSERTSTRING, 0, (LPARAM)L"TODOS");
 
 }
 

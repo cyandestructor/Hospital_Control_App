@@ -52,7 +52,7 @@ private:
 	Node<T> *m_head, *m_tail;
 	unsigned int m_size;
 
-	void InternQuickSort(T arr[], unsigned int l, unsigned int r);
+	void InternQuickSort(T arr[], int l, int r);
 
 };
 
@@ -465,7 +465,7 @@ void List<T>::QuickSort() {
 			aux = aux->next;
 		}
 
-		this->InternQuickSort(arr, 0, size);	//Call the intern quicksort to sort the array
+		this->InternQuickSort(arr, 0, size - 1);	//Call the intern quicksort to sort the array
 
 		this->Clear();	//Clear the list
 		//Then insert the elements in the correct order
@@ -480,9 +480,9 @@ void List<T>::QuickSort() {
 }
 
 template <typename T>
-void List<T>::InternQuickSort(T arr[], unsigned int l, unsigned int r) {
+void List<T>::InternQuickSort(T arr[], int l, int r) {
 
-	unsigned int i = l,
+	int i = l,
 		j = r,
 		pivot = (int)((l + r) * 0.5);
 
@@ -497,7 +497,7 @@ void List<T>::InternQuickSort(T arr[], unsigned int l, unsigned int r) {
 			std::swap(arr[i], arr[j]);
 			//continue
 			i++;
-			i--;
+			j--;
 		}
 	}
 

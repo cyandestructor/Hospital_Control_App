@@ -492,6 +492,8 @@ void MarkApp(HWND hWnd, List<Appointment>& appList, List<MedOffice>& moList) {
 	MedOffice& appMO = retVal.GetMedOffice(moList);
 	appMO.GetSchedule().SetFree(appEnd, appEnd);
 
+	MessageBoxW(hWnd, L"Se ha marcado la cita como atendida", L"Cita atendida", MB_ICONINFORMATION | MB_OK);
+
 }
 
 void CancelApp(HWND hWnd, List<Appointment>& appList, List<MedOffice>& moList) {
@@ -516,6 +518,8 @@ void CancelApp(HWND hWnd, List<Appointment>& appList, List<MedOffice>& moList) {
 
 	MedOffice& appMO = retVal.GetMedOffice(moList);
 	appMO.GetSchedule().SetFree(appEnd, appEnd);
+
+	MessageBoxW(hWnd, L"Se ha marcado la cita como cancelada", L"Cita cancelada", MB_ICONINFORMATION | MB_OK);
 
 }
 
@@ -568,7 +572,7 @@ void QueryWeek(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer)
 void QueryCode(HWND hWnd, List<Appointment>& appList, List<Appointment>& buffer) {
 
 	std::wstring aux;
-	GetWindowTextWstring(hWnd, aux);
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_QA_APPCODE_EDIT), aux);
 	unsigned int appCode = (unsigned int)stoi(aux);
 	GetAppByCode(appList, appCode, buffer, false);
 
@@ -714,7 +718,7 @@ void ShowQuery(HWND hWnd, List<Appointment>& appList) {
 
 	appList.ForEach([&](Appointment& app) {
 		DateTime appDT = app.GetDateTime();
-		std::wstring aux = std::to_wstring(app.Key()) + L" CITA" + appDT.DateTimeWstring();
+		std::wstring aux = std::to_wstring(app.Key()) + L" CITA " + appDT.DateTimeWstring();
 		SendDlgItemMessageW(hWnd, IDC_QA_APP_LIST, LB_ADDSTRING, NULL, (LPARAM)aux.c_str());
 		});
 
@@ -779,6 +783,7 @@ void ClearQuery(HWND hWnd, List<Appointment>& qBuffer) {
 	//CLEAR SOME EDIT CONTROLS
 	SetDlgItemTextW(hWnd, IDC_QA_DRNAME_EDIT, L"");
 	SetDlgItemTextW(hWnd, IDC_QA_DRSPE_EDIT, L"");
+	SetDlgItemTextW(hWnd, IDC_QA_APPCODE_EDIT, L"");
 
 	//DISABLE CONTROLS
 	HWND controls[6];
@@ -834,8 +839,6 @@ void InitRegAppControls(HWND hWnd, void(*initWithGlobals)(HWND)) {
 	if (initWithGlobals)
 		initWithGlobals(hWnd);
 
-	SendDlgItemMessageW(hWnd, IDC_RA_SELSPE_COMBO, CB_INSERTSTRING, 0, (LPARAM)L"TODOS");
-
 	SendDlgItemMessageW(hWnd, IDC_RA_DESC_EDIT, EM_SETLIMITTEXT, 300, NULL);	//DESCRIPT EDIT CONTROL
 	SendDlgItemMessageW(hWnd, IDC_RA_PHONENUM_EDIT, EM_SETLIMITTEXT, 10, NULL);	//PHONE NUM EDIT CONTROL
 
@@ -853,7 +856,7 @@ void GetAppRegisterInfo(HWND hWnd, Appointment& app) {
 	std::wstring aux;
 	GetWindowTextWstring(GetDlgItem(hWnd, IDC_RA_DESC_EDIT), aux);	//App description
 	app.SetDescription(aux);
-	GetWindowTextWstring(GetDlgItem(hWnd, IDC_RA_DESC_EDIT), aux);	//Phone number
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_RA_PHONENUM_EDIT), aux);	//Phone number
 	app.GetPhoneNumber().SetPhoneNumber(aux);
 
 	//Get Date Time
@@ -964,7 +967,7 @@ bool ValidDrSchAppTime(const Appointment& app, BinarySearchTree<Doctor>& drBST) 
 
 }
 
-void ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& moList) {
+bool ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& moList) {
 
 	//Get the info of the selected medical office
 	MedOffice& selMO = app.GetMedOffice(moList);
@@ -1000,6 +1003,8 @@ void ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& m
 		std::wstring msg = L"Se ha reservado la cita con código: " + std::to_wstring(app.Key());
 		MessageBoxW(NULL, msg.c_str(), L"Reserva", MB_ICONEXCLAMATION | MB_OK);
 	}
+
+	return !error;
 
 }
 
@@ -1308,6 +1313,22 @@ bool ValidateDoctorPerMO(HWND hWnd, BinarySearchTree<Doctor>& drBST, Doctor& toV
 
 }
 
+unsigned int AppointmentsPerDoctor(unsigned long drId, List<Appointment>& appList, std::vector<Appointment>* buffer) {
+
+	unsigned int count = 0;
+
+	appList.ForEach([&](Appointment& app) {
+		if (app.GetDoctorKey() == drId) {
+			count++;
+			if (buffer)
+				buffer->push_back(app);
+		}
+		});
+
+	return count;
+
+}
+
 void ClearDoctorRegister(HWND hWnd) {
 
 	{	//Clear edit controls
@@ -1327,9 +1348,11 @@ void ClearDoctorRegister(HWND hWnd) {
 	{	//Reset combo boxes
 		HWND genderCB = GetDlgItem(hWnd, IDC_RM_GENDER_COMBO);	//Gender
 		HWND medOffCB = GetDlgItem(hWnd, IDC_RM_MO_COMBO);		//Medical office
+		HWND speCB = GetDlgItem(hWnd, IDC_RM_SPE_COMBO);		//Speciality
 
 		SendMessageW(genderCB, CB_SETCURSEL, -1, NULL);
 		SendMessageW(medOffCB, CB_SETCURSEL, -1, NULL);
+		SendMessageW(speCB, CB_SETCURSEL, -1, NULL);
 	}
 
 	{	//Reset date time pickers
@@ -1417,15 +1440,18 @@ void ViewSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST, DLGPROC view
 
 }
 
-void DeleteSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST) {
+void DeleteSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST, List<Appointment>& appList) {
 
 	unsigned long id = GetIDFromLB(hWnd, IDC_DR_LIST);
 
-	Doctor key(id);
-
-	drBST.Delete(key);
-
-	//TODO: UPDATE LIST
+	if (AppointmentsPerDoctor(id, appList) == 0) {
+		Doctor key(id);
+		drBST.Delete(key);
+	}
+	else {
+		MessageBoxW(NULL, L"El médico ya tiene una cita", L"No se ha podido eliminar",
+			MB_ICONERROR | MB_OK);
+	}
 
 }
 

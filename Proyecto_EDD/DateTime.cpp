@@ -34,7 +34,10 @@ int DateTime::CompareWith(const DateTime& other) const {
 
 std::wstring DateTime::DateTimeWstring() const {
 	
-	return std::to_wstring(m_day) + L"/" + std::to_wstring(m_month) + L"/" + std::to_wstring(m_year);
+	wchar_t buffer[30] = L"";
+	swprintf_s(buffer, 30, L"%.2u/%.2u/%u %.2u:%.2u", m_day, m_month, m_year, m_hour, m_minute);
+
+	return std::wstring(buffer);
 
 }
 

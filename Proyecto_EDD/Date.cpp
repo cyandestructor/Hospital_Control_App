@@ -62,7 +62,7 @@ SYSTEMTIME Date::GetSystemTimeStruct() const {
 
 std::wstring Date::DateString() const {
 	
-	std::wstring aux = std::to_wstring(m_day) + L"/" + std::to_wstring(m_day) + L"/" + std::to_wstring(m_year);
+	std::wstring aux = std::to_wstring(m_day) + L"/" + std::to_wstring(m_month) + L"/" + std::to_wstring(m_year);
 
 	return aux;
 }
@@ -122,7 +122,7 @@ unsigned short Date::Year() const {
 
 }
 
-unsigned short Date::DaysPerMonth(unsigned short month, unsigned short year) {
+unsigned short Date::DaysPerMonth(unsigned short month, unsigned short year) const {
 
 	/*
 	30 days: april (4), june (6), september (9), november (11)
@@ -158,6 +158,30 @@ unsigned short Date::DaysPerMonth(unsigned short month, unsigned short year) {
 		return 0;
 	}
 
+}
+
+int Date::DifferenceWith(const Date& date) const {
+
+	return abs(this->GetDaysFromDayZero() - date.GetDaysFromDayZero());
+}
+
+int Date::CountLeapYears() const {
+	int years = m_year;
+	/*if (m_month <= 2)
+		years--;*/
+	return years / 4 - years / 100 + years / 400;
+}
+
+int Date::GetDaysFromDayZero() const {
+	
+	int count = m_year * 365 + m_day;
+
+	for (unsigned short i = 1; i < m_month; i++)
+		count += DaysPerMonth(i, m_year);
+
+	count += CountLeapYears();
+	
+	return count;
 }
 
 bool Date::AddDays() {

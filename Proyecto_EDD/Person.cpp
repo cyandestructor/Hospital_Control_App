@@ -76,10 +76,12 @@ const Date& Person::Birthdate() const {
 
 }
 
-unsigned short Person::Age() const {
+int Person::Age() const {
 
-	//TODO CALCULATE AGE
-	return 0;
+	Date today;	//Date initiallized with today's date
+	int diffDays = today.DifferenceWith(this->m_birthdate);
+
+	return (int)diffDays / 360;
 
 }
 

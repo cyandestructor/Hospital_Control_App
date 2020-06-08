@@ -50,7 +50,7 @@ void InitRegAppControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetAppRegisterInfo(HWND hWnd, Appointment& app);
 ValidationError ValidateAppRegister(HWND hWnd);
 bool ValidDrSchAppTime(const Appointment& app, BinarySearchTree<Doctor>& drBST);
-void ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& moList);
+bool ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& moList);
 void ClearAppRegister(HWND hWnd);
 void SelectPatient(HWND hWnd, int comboBoxID, List<Patient>& patList);
 void SelectDoctor(HWND hWnd, int comboBoxID, BinarySearchTree<Doctor>& drList);
@@ -62,11 +62,13 @@ void InitRegMedControls(HWND hWnd, void(*initWithGlobals)(HWND) = 0);
 void GetDoctorRegisterInfo(HWND hWnd, Doctor& doctor);
 ValidationError ValidateDoctorRegister(HWND hWnd);
 bool ValidateDoctorPerMO(HWND hWnd, BinarySearchTree<Doctor>& drBST, Doctor& toValidate);
+unsigned int AppointmentsPerDoctor(unsigned long drId, List<Appointment>& appList,
+	std::vector<Appointment>* buffer = nullptr);
 void ClearDoctorRegister(HWND hWnd);
 void LoadDoctorImg(HWND hWnd, int width, int height);
 bool GetImageFilename(HWND parent, std::wstring& buffer);
 void ViewSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST, DLGPROC viewerProc);
-void DeleteSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST);
+void DeleteSelectedDoctor(HWND hWnd, BinarySearchTree<Doctor>& drBST, List<Appointment>& appList);
 void SaveDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST);
 void GenDoctorReport(HWND hWnd, BinarySearchTree<Doctor>& drBST, const std::wstring& filePath);
 
