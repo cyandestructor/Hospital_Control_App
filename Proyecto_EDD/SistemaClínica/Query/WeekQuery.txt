@@ -1,0 +1,36 @@
+-----------------------------------------------
+# 276
+Fecha: 7/6/2020 22:20
+# Consultorio: 1
+Cod. Especialidad: 180
+Fecha: 7/6/2020 22:20
+Médico: Jose Antonio Martinez Martinez
+Paciente: Alma Patricia Duarte Lozano
+Tel: 81-2108-8790
+Atendida: no
+Cancelada: si
+-----------------------------------------------
+-----------------------------------------------
+# 1076
+Fecha: 8/6/2020 18:00
+# Consultorio: 1
+Cod. Especialidad: 180
+Fecha: 8/6/2020 18:00
+Médico: Jose Antonio Martinez Martinez
+Paciente: Bryan Emmanuel Duarte Lozano
+Tel: 81-2836-6112
+Atendida: no
+Cancelada: no
+-----------------------------------------------
+-----------------------------------------------
+# 1104
+Fecha: 8/6/2020 18:40
+# Consultorio: 1
+Cod. Especialidad: 180
+Fecha: 8/6/2020 18:40
+Médico: Jose Antonio Martinez Martinez
+Paciente: Ernesto Patricio Carranza Mata
+Tel: 82-8250-0990
+Atendida: no
+Cancelada: no
+-----------------------------------------------

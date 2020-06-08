@@ -1,0 +1,12 @@
+-----------------------------------------------
+# 1065
+Fecha: 7/6/2020 17:00
+# Consultorio: 1
+Cod. Especialidad: 180
+Fecha: 7/6/2020 17:00
+Médico: Ramiro Hernandez Lozano Cuellar
+Paciente: Jaciany Lizeth Jasso Valdez
+Tel: 81-2516-6745
+Atendida: no
+Cancelada: no
+-----------------------------------------------

@@ -1,0 +1,12 @@
+-----------------------------------------------
+# 276
+Fecha: 7/6/2020 22:20
+# Consultorio: 1
+Cod. Especialidad: 180
+Fecha: 7/6/2020 22:20
+Médico: Jose Antonio Martinez Martinez
+Paciente: Alma Patricia Duarte Lozano
+Tel: 81-2108-8790
+Atendida: no
+Cancelada: no
+-----------------------------------------------

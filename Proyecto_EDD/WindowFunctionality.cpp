@@ -262,6 +262,18 @@ std::wstring DocumentsDirectory() {
 
 }
 
+std::wstring CurrentDirectory() {
+
+	std::wstring directory;
+	int size = GetCurrentDirectoryW(0, NULL);
+	directory.resize(size);
+	GetCurrentDirectoryW(size, &directory[0]);
+	directory.resize(size - 1);
+
+	return directory;
+
+}
+
 void UpdateDoctorList(HWND hWnd, BinarySearchTree<Doctor>& drBST, int controlID, bool cb) {
 	
 	int clear = LB_RESETCONTENT;
@@ -1941,7 +1953,13 @@ void LoadFiles(List<Appointment>& appList,
 	List<MedOffice>& medOffList,
 	BinarySearchTree<Doctor>& drBST) {
 
-	std::wstring dataDirectory = DocumentsDirectory() + MAIN_FOLDER + DATA_FOLDER;
+	std::wstring dataDirectory;
+	int res = MessageBoxW(NULL, L"¿Le gustaría leer los archivos precargados?", L"Lectura de archivos",
+		MB_ICONQUESTION | MB_YESNO);
+	if (res == IDYES)
+		dataDirectory = CurrentDirectory() + MAIN_FOLDER + DATA_FOLDER;
+	else if (res == IDNO)
+		dataDirectory = DocumentsDirectory() + MAIN_FOLDER + DATA_FOLDER;
 
 	appList.ReadFromFile(dataDirectory + L"\\appoint.data");
 	patList.ReadFromFile(dataDirectory + L"\\patient.data");
