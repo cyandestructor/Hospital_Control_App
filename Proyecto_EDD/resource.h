@@ -14,6 +14,7 @@
 #define IDD_VIEW_MED                    110
 #define IDD_VIEW_PATIENT                111
 #define IDD_VIEW_SPE                    112
+#define IDD_LOGIN                       113
 #define IDC_COMBO1                      1002
 #define IDC_RP_GENDER_COMBO             1002
 #define IDC_COMBO2                      1003
@@ -23,10 +24,13 @@
 #define IDC_EDIT1                       1005
 #define IDC_RS_SPENAME_EDIT             1005
 #define IDC_DATETIME_EDIT               1005
+#define IDC_USERNAME_EDIT               1005
 #define IDC_DATETIMEPICKER1             1006
 #define IDC_EDIT15                      1006
 #define IDC_RA_APPDATE_DTP              1006
 #define IDC_RS_SPEDESC_EDIT             1006
+#define IDC_PASSWORD                    1006
+#define IDC_PASSWORD_EDIT               1006
 #define IDC_DATETIMEPICKER2             1007
 #define IDC_EDIT12                      1007
 #define IDC_EDIT16                      1007
@@ -81,9 +85,10 @@
 #define IDC_RETURN_CMD                  1021
 #define IDC_BUTTON3                     1022
 #define IDC_RS_LOOKSPE_CMD              1022
-#define IDC_RETURN_CMD2                 1022
+#define IDC_LOGIN_CMD                   1022
 #define IDC_LIST1                       1023
 #define IDC_SPE_LIST                    1023
+#define IDC_EXIT_CMD                    1023
 #define IDC_BUTTON4                     1024
 #define IDC_DATETIMEPICKER4             1024
 #define IDC_QA_LOOKAPP_CMD              1024
@@ -167,6 +172,7 @@
 #define IDC_EDIT_SPE_CMD                1089
 #define IDC_SAVE_EDIT_SPE_CMD           1090
 #define IDC_CANCEL_EDIT_SPE_CMD         1091
+#define IDC_ERROR_LOG                   1092
 #define CMD_REG_MED                     40004
 #define CMD_REG_PATIENT                 40005
 #define CMD_REG_DOC                     40006
@@ -179,9 +185,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        111
+#define _APS_NEXT_RESOURCE_VALUE        115
 #define _APS_NEXT_COMMAND_VALUE         40011
-#define _APS_NEXT_CONTROL_VALUE         1092
+#define _APS_NEXT_CONTROL_VALUE         1093
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

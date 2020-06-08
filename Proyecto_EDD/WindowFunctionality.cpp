@@ -2397,4 +2397,40 @@ LRESULT CALLBACK FloatOnlyEditCtrlWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
 
 #pragma endregion Control_Subclasses
 
+#pragma region USER_MANAGEMENT
+
+bool CheckUserCredentials(HWND hWnd, User& user) {
+	
+	std::wstring username, password;
+
+	std::wifstream usersFile;
+	User auxUser;
+
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_USERNAME_EDIT), username);
+	GetWindowTextWstring(GetDlgItem(hWnd, IDC_PASSWORD_EDIT), password);
+
+	usersFile.open(L"users.txt", ios::in);
+
+	if (usersFile.is_open()) {
+
+		while (usersFile >> auxUser) {
+			if (auxUser.CheckUser(username, password)) {
+				user = auxUser;
+				return true;
+			}
+		}
+
+	}
+	else {
+		MessageBoxW(hWnd, L"No se ha encontrado un archivo de usuarios.", L"Error de archivos",
+			MB_ICONERROR | MB_OK);
+	}
+
+	SetDlgItemTextW(hWnd, IDC_ERROR_LOG, L"Las credenciales de usuario son incorrectas");
+	return false;
+
+}
+
+#pragma endregion USER_MANAGEMENT
+
 #pragma endregion Window_Functionality

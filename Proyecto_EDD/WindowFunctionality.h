@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 #include "Appointment.h"
+#include "User.h"
 
 #define MAIN_FOLDER L"\\SistemaClínica"
 #define DATA_FOLDER L"\\Data"
@@ -132,6 +133,9 @@ void SaveFiles(List<Appointment>& appList,
 	List<Speciality>& speList,
 	List<MedOffice>& medOffList,
 	BinarySearchTree<Doctor>& drBST);
+
+//User management
+bool CheckUserCredentials(HWND hWnd, User& user);
 
 //Miscelaneous
 

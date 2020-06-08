@@ -26,6 +26,7 @@ BOOL CALLBACK ViewAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK ViewPatientWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK ViewMedWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK ViewSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK LoginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void IWGQueryApp(HWND hWnd);
 void IWGRegApp(HWND hWnd);
@@ -116,6 +117,8 @@ BOOL CALLBACK MainWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			hWnd, (DLGPROC)RegSpeWinProc, NULL);
 		//Initiate clock
 		SetTimer(hWnd, TIMER_CLOCK, 1000, (TIMERPROC)NULL);
+		//LOGIN
+		DialogBoxParamW(hInstance, MAKEINTRESOURCEW(IDD_LOGIN), hWnd, LoginWinProc, (LPARAM)hWnd);
 		break;
 	case WM_COMMAND:
 
@@ -143,8 +146,10 @@ BOOL CALLBACK MainWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		break;
 	case WM_CLOSE:
 	case WM_DESTROY:
-		SaveFiles(g_appList, g_patientList, g_speList, g_medOffList, g_doctorBST);
-		PostQuitMessage(0);
+		if (MessageBoxW(hWnd, L"¿Está seguro de que quiere salir?", L"Salir", MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK) {
+			SaveFiles(g_appList, g_patientList, g_speList, g_medOffList, g_doctorBST);
+			PostQuitMessage(0);
+		}
 		break;
 	case WM_TIMER:
 		Clock(hWnd);
@@ -695,6 +700,41 @@ BOOL CALLBACK ViewSpeWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 	}
 
 	return TRUE;
+
+}
+
+BOOL CALLBACK LoginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	
+	User user;
+	static HWND parent = NULL;
+
+	switch (msg) {
+	case WM_INITDIALOG:
+		parent = (HWND)lParam;
+		break;
+	case WM_COMMAND:
+
+		switch (LOWORD(wParam)) {
+		case IDC_LOGIN_CMD:
+			if (CheckUserCredentials(hWnd, user)) {
+				SetDlgItemTextW(parent, IDC_MAIN_USERNAME, user.UserName().c_str());
+				SetDlgItemTextW(parent, IDC_MAIN_USER_FULLNAME, user.Name().c_str());
+				EndDialog(hWnd, 1);
+			}
+			break;
+		case IDC_EXIT_CMD:
+			PostQuitMessage(0);	//END APP
+			break;
+		}
+
+		break;
+	default:
+		return FALSE;
+
+	}
+
+	return TRUE;
+
 
 }
 

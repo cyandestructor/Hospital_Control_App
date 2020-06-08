@@ -431,6 +431,21 @@ BEGIN
     PUSHBUTTON      "Regresar",IDC_RETURN_CMD,18,198,168,14
 END
 
+IDD_LOGIN DIALOGEX 0, 0, 248, 110
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Bienvenido",IDC_STATIC,12,12,36,8
+    LTEXT           "Ingresa tu usuario y contraseña",IDC_STATIC,12,24,104,8
+    EDITTEXT        IDC_USERNAME_EDIT,60,42,180,14,ES_AUTOHSCROLL
+    LTEXT           "Usuario",IDC_STATIC,24,42,25,8
+    LTEXT           "Contraseña",IDC_STATIC,12,60,38,8
+    EDITTEXT        IDC_PASSWORD_EDIT,60,60,180,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "",IDC_ERROR_LOG,12,84,108,12,WS_BORDER
+    PUSHBUTTON      "Ingresar",IDC_LOGIN_CMD,132,84,50,14
+    PUSHBUTTON      "Salir",IDC_EXIT_CMD,192,84,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -519,6 +534,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 223
     END
+
+    IDD_LOGIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 241
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 103
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -574,6 +597,11 @@ BEGIN
 END
 
 IDD_VIEW_SPE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_LOGIN AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

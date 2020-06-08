@@ -156,6 +156,7 @@
     <ClInclude Include="Speciality.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="TimePeriod.h" />
+    <ClInclude Include="User.h" />
     <ClInclude Include="WindowFunctionality.h" />
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +174,7 @@
     <ClCompile Include="Speciality.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="TimePeriod.cpp" />
+    <ClCompile Include="User.cpp" />
     <ClCompile Include="WindowFunctionality.cpp" />
   </ItemGroup>
   <ItemGroup>
