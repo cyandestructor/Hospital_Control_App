@@ -61,7 +61,7 @@ void Schedule::Free() {
 
 bool Schedule::ConflictWith(const Schedule& other, SchValidate validate) const {
 
-	bool timeConfict = false, workDayConflict = false;
+	bool timeConfict = false, workDayConflict = false, hourConflict = false;
 
 	if (validate == SchValidate::SCH_TIME || validate == SchValidate::SCH_ALL) {
 		//Check if there is any conflict between both schedules times
@@ -73,7 +73,23 @@ bool Schedule::ConflictWith(const Schedule& other, SchValidate validate) const {
 		}
 	}
 
-	if (validate == SchValidate::SCH_WORKDAY || validate == SchValidate::SCH_ALL) {
+	if (validate == SchValidate::SCH_HOUR || validate == SchValidate::SCH_HOUR_WORKDAY) {
+		//check if there is any conflict between both schedule times (hour)
+		auto& otherReserved = other.GetReservedTime();
+		for (auto& time : m_reservedTime) {
+			for (int i = 0; i < otherReserved.size(); i++) {
+				if (time.Begin().Hour() >= otherReserved[i].Begin().Hour() &&
+					time.Begin().Minute() >= otherReserved[i].Begin().Minute() &&
+					time.End().Hour() < otherReserved[i].End().Hour() &&
+					time.End().Minute() < otherReserved[i].End().Minute()) {
+					hourConflict = true;
+				}
+			}
+		}
+	}
+
+	if (validate == SchValidate::SCH_WORKDAY || validate == SchValidate::SCH_ALL
+		|| validate == SchValidate::SCH_HOUR_WORKDAY) {
 		//Check if there is any conflict between both schedules workdays
 		for (unsigned short i = 0; i < 7; i++) {
 			if (m_workDays[i] == other.IsWorkDay(i)) {
@@ -93,6 +109,11 @@ bool Schedule::ConflictWith(const Schedule& other, SchValidate validate) const {
 	case SchValidate::SCH_ALL:
 		return timeConfict && workDayConflict;		//There is a conflict in time and workday
 		break;
+	case SchValidate::SCH_HOUR:
+		return hourConflict;
+		break;
+	case SchValidate::SCH_HOUR_WORKDAY:
+		return hourConflict && workDayConflict;
 	default:
 		return false;
 	}

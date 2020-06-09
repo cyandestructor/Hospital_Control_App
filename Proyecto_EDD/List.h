@@ -203,11 +203,11 @@ bool List<T>::ReadFromFile(const std::wstring& filePath) {
 	ifstream file(filePath, ios::in | ios::binary);
 
 	if (file.good()) {
-		T temp;
 		//Read the total of written objects
 		unsigned int size = 0;
 		file.read(reinterpret_cast<char*>(&size), sizeof(unsigned int));
 		for (unsigned int i = 0; i < size; i++) {
+			T temp;
 			temp.Read(file);
 			Push(temp);
 		}

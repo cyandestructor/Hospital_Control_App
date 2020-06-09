@@ -7,7 +7,7 @@
 #include "TimePeriod.h"
 
 enum class SchValidate {
-	SCH_WORKDAY, SCH_TIME, SCH_ALL
+	SCH_WORKDAY, SCH_HOUR, SCH_HOUR_WORKDAY, SCH_TIME, SCH_ALL
 };
 
 class Schedule {

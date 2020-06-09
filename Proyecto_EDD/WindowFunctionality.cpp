@@ -540,15 +540,20 @@ void QueryDoctorMonth(HWND hWnd, List<Appointment>& appList, List<Appointment>& 
 	//Get Dr profesional ID
 	std::wstring aux;
 	GetWindowTextWstring(GetDlgItem(hWnd, IDC_QA_PID_EDIT), aux);
-	unsigned long proID = std::stoul(aux);
+	unsigned long proID = 0;
+	if (aux != L"") {
+		proID = std::stoul(aux);
+		//Get Month
+		unsigned short month = (unsigned short)SendDlgItemMessageW(hWnd, IDC_QA_MONTH_COMBO, CB_GETCURSEL, NULL, NULL) + 1;
 
-	//Get Month
-	unsigned short month = (unsigned short)SendDlgItemMessageW(hWnd, IDC_QA_MONTH_COMBO, CB_GETCURSEL, NULL, NULL) + 1;
+		if (month >= 1) {
+			//QUERY
+			List<Appointment> tempBuffer;
+			GetAppByDoctor(appList, proID, tempBuffer, false);
+			GetAppByMonth(tempBuffer, month, buffer, false);	//	Filtering
+		}
 
-	//QUERY
-	List<Appointment> tempBuffer;
-	GetAppByDoctor(appList, proID, tempBuffer, false);
-	GetAppByMonth(tempBuffer, month, buffer, false);	//	Filtering
+	}
 
 }
 
@@ -968,9 +973,9 @@ bool ValidDrSchAppTime(const Appointment& app, BinarySearchTree<Doctor>& drBST) 
 	auxSch.Reserve(appDT, endDT);
 	auxSch.SetWorkDay(appDT.WeekDay(), true);
 
-	if (!drSch.ConflictWith(auxSch, SchValidate::SCH_ALL)) {
+	if (!drSch.ConflictWith(auxSch, SchValidate::SCH_HOUR_WORKDAY)) {
 		//THE DOCTOR SCHEDULE AND THE APP TIME DO NOT MATCH
-		MessageBoxW(NULL, L"Error", L"El doctor seleccionado no está disponible en esa fecha y hora",
+		MessageBoxW(NULL, L"El doctor seleccionado no está disponible en esa fecha y hora", L"Error",
 			MB_ICONERROR | MB_OK);
 		return false;
 	}
@@ -979,13 +984,16 @@ bool ValidDrSchAppTime(const Appointment& app, BinarySearchTree<Doctor>& drBST) 
 
 }
 
-bool ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& moList) {
+bool ReserveApp(Appointment& app, List<Appointment>& appList, List<MedOffice>& moList, BinarySearchTree<Doctor>& drBST) {
 
 	//Get the info of the selected medical office
 	MedOffice& selMO = app.GetMedOffice(moList);
 	
 	DateTime beginTime = app.GetDateTime(), endTime = app.GetDateTime();
 	bool error = false;
+
+	if (!ValidDrSchAppTime(app, drBST))
+		return false;
 
 	if (app.IsDouble()) {
 
@@ -1181,6 +1189,9 @@ void GetDoctorRegisterInfo(HWND hWnd, Doctor& doctor) {
 		doctor.SetBirthdate(Date(bdate));
 		SendDlgItemMessageW(hWnd, IDC_RM_SCHE_FROM_DTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&from);	//Schedule
 		SendDlgItemMessageW(hWnd, IDC_RM_SCHE_TO_DTP, DTM_GETSYSTEMTIME, NULL, (LPARAM)&to);
+		from.wDay = to.wDay = 0;
+		from.wMonth = to.wMonth = 0;
+		from.wYear = to.wYear = 0;
 		doctor.GetSchedule().Reserve(DateTime(from), DateTime(to));
 	}
 
@@ -1310,7 +1321,7 @@ bool ValidateDoctorPerMO(HWND hWnd, BinarySearchTree<Doctor>& drBST, Doctor& toV
 	//Check if there are conflicts with the schedules of those doctors and the new one
 	bool conflict = false;
 	for (auto& doctor : doctorsInMO) {
-		if (doctor.GetSchedule().ConflictWith(toValidate.GetSchedule(),SchValidate::SCH_ALL)) {
+		if (doctor.GetSchedule().ConflictWith(toValidate.GetSchedule(), SchValidate::SCH_HOUR_WORKDAY)) {
 			conflict = true;
 			break;
 		}
@@ -2009,7 +2020,7 @@ void ShowAppointmentInfo(HWND hWnd, Appointment& app, Patient& patient, Doctor& 
 	//Write doctor info
 	SetDlgItemTextW(hWnd, IDC_DR_NAME_EDIT, doctor.GetName(Names::FULL_NAME).c_str());
 	SetDlgItemTextW(hWnd, IDC_DR_PROID_EDIT, doctor.ProfessionalID().c_str());
-	SetPictureControlImg(doctor.GetImagePath().c_str(), 300, 300, hWnd, IDC_DR_IMG);
+	SetPictureControlImg(doctor.GetImagePath().c_str(), 170, 170, hWnd, IDC_DR_IMG);
 
 	//Write speciality info
 	SetDlgItemTextW(hWnd, IDC_DR_SPE_EDIT, spe.Name().c_str());

@@ -84,7 +84,7 @@ BOOL CALLBACK MainWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	subwindows[3] : Registro de médicos
 	subwindows[4] :	Registro de especialidad
 	*/
-		//MedOffice mo1, mo2;
+	//MedOffice mo1, mo2, mo3, mo4, mo5, mo6, mo7, mo8;
 
 	switch (msg) {
 
@@ -95,8 +95,20 @@ BOOL CALLBACK MainWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		/*mo1.SetNumber(1);
 		mo2.SetNumber(2);
+		mo3.SetNumber(3);
+		mo4.SetNumber(4);
+		mo5.SetNumber(5);
+		mo6.SetNumber(6);
+		mo7.SetNumber(7);
+		mo8.SetNumber(8);
 		g_medOffList.Push(mo2);
-		g_medOffList.Push(mo1);*/
+		g_medOffList.Push(mo1);
+		g_medOffList.Push(mo3);
+		g_medOffList.Push(mo4);
+		g_medOffList.Push(mo5);
+		g_medOffList.Push(mo6);
+		g_medOffList.Push(mo7);
+		g_medOffList.Push(mo8);*/
 
 		//Registrar citas
 		subwindows[0] = CreateDialogParamW(hInstance, MAKEINTRESOURCEW(IDD_REG_APP),
@@ -118,7 +130,7 @@ BOOL CALLBACK MainWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		//Initiate clock
 		SetTimer(hWnd, TIMER_CLOCK, 1000, (TIMERPROC)NULL);
 		//LOGIN
-		DialogBoxParamW(hInstance, MAKEINTRESOURCEW(IDD_LOGIN), hWnd, LoginWinProc, (LPARAM)hWnd);
+		//DialogBoxParamW(hInstance, MAKEINTRESOURCEW(IDD_LOGIN), hWnd, LoginWinProc, (LPARAM)hWnd);
 		break;
 	case WM_COMMAND:
 
@@ -180,7 +192,7 @@ BOOL CALLBACK RegAppWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			validationError = ValidateAppRegister(hWnd);
 			if (validationError.errorCode == ErrorCode::EC_NO_ERROR) {
 				GetAppRegisterInfo(hWnd, app);	//Get info from controls
-				if (ReserveApp(app, g_appList, g_medOffList))
+				if (ReserveApp(app, g_appList, g_medOffList, g_doctorBST))
 					ClearAppRegister(hWnd);
 			}
 			else {

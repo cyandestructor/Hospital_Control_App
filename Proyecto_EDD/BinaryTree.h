@@ -103,8 +103,8 @@ void BinaryTree<T>::Read(std::istream& is) {
 	unsigned long size = 0;
 	is.read(reinterpret_cast<char*>(&size), sizeof(unsigned long));
 
-	T temp;
 	for (unsigned long i = 0; i < size; i++) {
+		T temp;
 		temp.Read(is);
 		this->Insert(temp);
 	}
