@@ -130,7 +130,7 @@ BOOL CALLBACK MainWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		//Initiate clock
 		SetTimer(hWnd, TIMER_CLOCK, 1000, (TIMERPROC)NULL);
 		//LOGIN
-		//DialogBoxParamW(hInstance, MAKEINTRESOURCEW(IDD_LOGIN), hWnd, LoginWinProc, (LPARAM)hWnd);
+		DialogBoxParamW(hInstance, MAKEINTRESOURCEW(IDD_LOGIN), hWnd, LoginWinProc, (LPARAM)hWnd);
 		break;
 	case WM_COMMAND:
 

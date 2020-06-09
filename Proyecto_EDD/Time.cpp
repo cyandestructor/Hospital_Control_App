@@ -63,3 +63,21 @@ unsigned short Time::Minute() const {
 	return m_minute;
 
 }
+
+short Time::CompareTimes(const Time& one, const Time& two) {
+	
+	if (one.Hour() > two.Hour()) {
+		return 1;
+	}
+	else if (one.Hour() == two.Hour()) {
+		if (one.Minute() > two.Minute()) {
+			return 1;
+		}
+		else if (one.Minute() == two.Minute()) {
+			return 0;
+		}
+	}
+
+	return -1;
+
+}

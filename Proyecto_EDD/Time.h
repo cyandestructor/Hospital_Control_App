@@ -16,6 +16,7 @@ public:
 	unsigned short AddTime(unsigned short hour, unsigned short minute);
 	unsigned short Hour() const;
 	unsigned short Minute() const;
+	static short CompareTimes(const Time& one, const Time& two);
 
 protected:
 	unsigned short m_hour;

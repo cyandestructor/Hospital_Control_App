@@ -78,12 +78,24 @@ bool Schedule::ConflictWith(const Schedule& other, SchValidate validate) const {
 		auto& otherReserved = other.GetReservedTime();
 		for (auto& time : m_reservedTime) {
 			for (int i = 0; i < otherReserved.size(); i++) {
-				if (time.Begin().Hour() >= otherReserved[i].Begin().Hour() &&
-					time.Begin().Minute() >= otherReserved[i].Begin().Minute() &&
-					time.End().Hour() < otherReserved[i].End().Hour() &&
-					time.End().Minute() < otherReserved[i].End().Minute()) {
+
+				Time beginHour1(time.Begin().Hour(), time.Begin().Minute());
+				Time beginHour2(otherReserved[i].Begin().Hour(), otherReserved[i].Begin().Minute());
+				Time endHour1(time.End().Hour(), time.End().Minute());
+				Time endHour2(otherReserved[i].End().Hour(), otherReserved[i].End().Minute());
+
+				if (Time::CompareTimes(beginHour1, beginHour2) <= 0 &&
+					Time::CompareTimes(endHour1, endHour2) >= 0) {
 					hourConflict = true;
 				}
+
+				/*if (time.Begin().Hour() <= otherReserved[i].Begin().Hour() &&
+					time.Begin().Minute() <= otherReserved[i].Begin().Minute() &&
+					time.End().Hour() >= otherReserved[i].End().Hour() &&
+					time.End().Minute() >= otherReserved[i].End().Minute()) {
+					hourConflict = true;
+					break;
+				}*/
 			}
 		}
 	}

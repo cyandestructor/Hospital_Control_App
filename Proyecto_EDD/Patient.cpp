@@ -119,7 +119,11 @@ unsigned int Patient::Key() const {
 
 unsigned int Patient::GenKey() const {
 
-	m_key = (unsigned int)(m_height + m_weight + (int)m_bloodType);
+	Date aux;
+	unsigned int code = (unsigned int)(m_height + m_weight + (int)m_bloodType);
+	code += this->Birthdate().Day();
+	code += aux.Day() + aux.Month() + aux.Year();
+	m_key = code;
 
 	return m_key;
 
